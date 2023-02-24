@@ -18,6 +18,27 @@ export default class Message {
 
   async load() {
     await this.connect()
+    const { data } = await this.client.send('load.messages')
+    this.ingestMessages(data)
+  }
+
+  async send(text) {
+    console.log(text)
+    await this.client.send('create.message', {
+      text,
+    })
+  }
+
+  async ingestMessages(message) {
+    let newMessages = [...this.messages]
+    for (const msg of [message].flat()) {
+      newMessages = [
+        msg,
+        ...newMessages.filter(m => m._id !== msg._id),
+      ]
+    }
+    newMessages.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+    this.messages = newMessages
   }
 
   async connect() {
@@ -38,11 +59,8 @@ export default class Message {
     }
     this.client.addConnectedHandler(() => {
       this.connected = this.client.connected
-      if (!this.connected) {
-        // clear the client, possibly attempt reconnect
-        this.client = null
-      }
     })
+    this.client.listen('msg', ({ data }) => this.ingestMessages(data))
     this.keepaliveTimer = setInterval(() => this.client.send('ping'), 5 * 60 * 1000)
     const { data, message, status } = await this.client.send('info')
     this.info = data

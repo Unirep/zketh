@@ -10,20 +10,24 @@ import state from '../contexts/state'
 export default observer(() => {
     const { user, msg } = React.useContext(state)
 
-    // if (!user.userState) {
-    //     return (
-    //     <div className="container">
-    //         Loading...
-    //     </div>
-    //     )
-    // }
+    const [draft, setDraft] = React.useState('')
 
     return (
         <div className="container">
             <div className="title">public anonymous chat for ens owners</div>
+            <input type="text"
+            value={draft}
+            onKeyPress={async (e) => {
+                if (e.charCode != 13) return
+                msg.send(draft)
+                setDraft('')
+            }}
+            onChange={(e) => {
+                setDraft(e.target.value)
+            }} />
             {msg.messages.map(m => (
-                <div>
-                    {m.name}
+                <div key={m._id}>
+                    {m.text}
                 </div>
             ))}
         </div>
