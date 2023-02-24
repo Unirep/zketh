@@ -47,8 +47,7 @@ let wsApp, httpApp
 const db = await SQLiteConnector.create(schema, ':memory:')
 
 const state = { app: httpApp, wsApp, db, synchronizer }
-await importFunctionDirectory('ws', state)
-await importFunctionDirectory('http', state)
+await importFunctionDirectory('routes', state)
 
 // name relative to file location
 async function importFunctionDirectory(dirname, state) {

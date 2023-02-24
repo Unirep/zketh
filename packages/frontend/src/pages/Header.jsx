@@ -9,7 +9,20 @@ export default observer(() => {
   return (
     <>
       <div className="header">
-        <div>Connected {msg.connected.toString()}</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div
+            style={{
+              width: '10px',
+              height: '10px',
+              background: msg.connected ? 'green' : 'red',
+              borderRadius: '10px',
+            }}
+          />
+          <div style={{ width: '4px' }} />
+          <div style={{ fontSize: '12px' }}>
+            {msg.connected ? 'Connected' : 'Disconnected'}
+          </div>
+        </div>
         <div className="links">
           <a href="https://developer.unirep.io/" target="blank">
             Docs

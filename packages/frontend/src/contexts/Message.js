@@ -23,7 +23,6 @@ export default class Message {
   }
 
   async send(text) {
-    console.log(text)
     await this.client.send('create.message', {
       text,
     })

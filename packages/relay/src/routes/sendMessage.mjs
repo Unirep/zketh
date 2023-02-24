@@ -2,6 +2,7 @@ export default ({ wsApp, db, synchronizer }) => {
   wsApp.handle('create.message', async (data, send, next) => {
     // TODO: verify zk proof to send message
     const { text } = data
+    if (!text.trim()) return send(0)
     const timestampSpread = 250
     let timestamp = +new Date()
     let existing
