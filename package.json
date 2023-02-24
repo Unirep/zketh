@@ -1,0 +1,27 @@
+{
+  "name": "create-zketh",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install": "lerna bootstrap",
+    "contracts": "yarn workspace @zketh/contracts run",
+    "frontend": "yarn workspace @zketh/frontend run",
+    "relay": "yarn workspace @zketh/relay run",
+    "start": "node scripts/start.mjs",
+    "linkUnirep": "sh ./scripts/linkUnirep.sh",
+    "copyUnirep": "sh ./scripts/copyUnirep.sh",
+    "lint": "prettier ."
+  },
+  "devDependencies": {
+    "lerna": "^6.0.1",
+    "node-fetch": "^3.3.0"
+  },
+  "dependencies": {
+    "prettier": "^2.8.4"
+  }
+}
