@@ -2,10 +2,13 @@ import url from 'url'
 import path from 'path'
 import fs from 'fs'
 import express from 'express'
+import especial from 'especial'
 import { provider, PRIVATE_KEY } from './config.mjs'
 import TransactionManager from './singletons/TransactionManager.mjs'
 import synchronizer from './singletons/AppSynchronizer.mjs'
 import HashchainManager from './singletons/HashchainManager.mjs'
+import schema from './schema.mjs'
+import { SQLiteConnector } from 'anondb/node.js'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
@@ -16,21 +19,44 @@ await TransactionManager.start()
 
 HashchainManager.startDaemon()
 
-const app = express()
-const port = process.env.PORT ?? 8000
-app.listen(port, () => console.log(`Listening on port ${port}`))
-app.use('*', (req, res, next) => {
-  res.set('access-control-allow-origin', '*')
-  res.set('access-control-allow-headers', '*')
-  next()
-})
-app.use(express.json())
-app.use('/build', express.static(path.join(__dirname, '../keys')))
+// initialize websocket server
+let wsApp, httpApp
+{
+  const app = especial()
+  const port = process.env.WS_PORT ?? 8001
+  app.listen(port, () => console.log(`Websocket on port ${port}`))
+  app.handle('ping', (_, send) => send('pong'))
+  wsApp = app
+}
 
-// import all non-index files from this folder
-const routeDir = path.join(__dirname, 'routes')
-const routes = await fs.promises.readdir(routeDir)
-for (const routeFile of routes) {
-  const { default: route } = await import(path.join(routeDir, routeFile))
-  route({ app, db: synchronizer._db, synchronizer})
+// initialize http server
+{
+  const app = express()
+  const port = process.env.WS_PORT ?? 8000
+  app.listen(port, () => console.log(`HTTP on port ${port}`))
+  app.use('*', (req, res, next) => {
+    res.set('access-control-allow-origin', '*')
+    res.set('access-control-allow-headers', '*')
+    next()
+  })
+  app.use(express.json())
+  app.use('/build', express.static(path.join(__dirname, '../keys')))
+  httpApp = app
+}
+
+const db = SQLiteConnector.create(schema, ':memory:')
+
+const state = { app: httpApp, wsApp, db, synchronizer}
+await importFunctionDirectory('ws', state)
+await importFunctionDirectory('http', state)
+
+// name relative to file location
+async function importFunctionDirectory(dirname, state) {
+  // import all non-index files from __dirname/name this folder
+  const routeDir = path.join(__dirname, dirname)
+  const routes = await fs.promises.readdir(routeDir)
+  for (const routeFile of routes) {
+    const { default: route } = await import(path.join(routeDir, routeFile))
+    route(state)
+  }
 }

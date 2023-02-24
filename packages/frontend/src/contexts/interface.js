@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 
 const MAX_MOBILE_WIDTH = 780;
 
-export class Interface {
+export default class Interface {
   // dark/light mode
   // interface viewport size
   darkmode = false;
@@ -52,4 +52,3 @@ export class Interface {
   }
 }
 
-export default createContext(new Interface());

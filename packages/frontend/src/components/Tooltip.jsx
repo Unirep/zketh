@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import measureText from '../utils/measure-text'
 import './tooltip.css'
-import UIContext from '../contexts/interface'
+import state from '../contexts/state'
 import { observer } from 'mobx-react-lite'
 
 export default observer(({
@@ -9,7 +9,7 @@ export default observer(({
   maxWidth,
   ...props
 }) => {
-  const ui = React.useContext(UIContext)
+  const { ui } = React.useContext(state)
   const containerEl = React.createRef()
   const [timer, setTimer] = useState(null)
   const [showingPopup, setShowingPopup] = useState(false)

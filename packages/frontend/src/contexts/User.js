@@ -8,7 +8,7 @@ import { provider, UNIREP_ADDRESS, APP_ADDRESS, SERVER } from '../config'
 import prover from './prover'
 import poseidon from 'poseidon-lite'
 
-class User {
+export default class User {
 
   currentEpoch
   latestTransitionedEpoch
@@ -145,5 +145,3 @@ class User {
     return { ...reputationProof, valid: await reputationProof.verify() }
   }
 }
-
-export default createContext(new User())

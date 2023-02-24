@@ -34,6 +34,7 @@ export default ({ app, db, synchronizer }) => {
       res.json({ hash })
 
     } catch (error) {
+      console.log(error)
       res.status(500).json({ error })
     }
 

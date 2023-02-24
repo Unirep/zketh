@@ -4626,6 +4626,14 @@ eslint-scope@5.1.1:
     esrecurse "^4.3.0"
     estraverse "^4.1.1"
 
+especial@^0.1.0-beta-3:
+  version "0.1.0-beta-3"
+  resolved "https://registry.yarnpkg.com/especial/-/especial-0.1.0-beta-3.tgz#c2c105f00af01c602674325963bb0462b0fcde2f"
+  integrity sha512-VIolhML5QQbkNgkulxSij3kqqPA72awAxZcCpW4Sj5G1f/WSYB5WwddOwE5ETHrFc9z08QacCDOWM5vnwTp5jA==
+  dependencies:
+    nanoid "^3.1.30"
+    ws "^7.3.1"
+
 esprima@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
@@ -10486,7 +10494,7 @@ ws@^3.0.0:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
-ws@^7.4.6:
+ws@^7.3.1, ws@^7.4.6:
   version "7.5.9"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.9.tgz#54fa7db29f4c7cec68b1ddd3a89de099942bb591"
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
