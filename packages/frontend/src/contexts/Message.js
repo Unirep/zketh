@@ -32,12 +32,9 @@ export default class Message {
   async ingestMessages(message) {
     let newMessages = [...this.messages]
     for (const msg of [message].flat()) {
-      newMessages = [
-        msg,
-        ...newMessages.filter(m => m._id !== msg._id),
-      ]
+      newMessages = [msg, ...newMessages.filter((m) => m._id !== msg._id)]
     }
-    newMessages.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+    newMessages.sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1))
     this.messages = newMessages
   }
 
@@ -45,10 +42,9 @@ export default class Message {
     if (this.connected) return console.log('Already connected')
     try {
       const _client = new EspecialClient(WS_SERVER)
-      makeObservable(_client,
-        {
-          connected: observable
-          })
+      makeObservable(_client, {
+        connected: observable,
+      })
 
       this.client = _client
       await _client.connect()
@@ -61,9 +57,11 @@ export default class Message {
       this.connected = this.client.connected
     })
     this.client.listen('msg', ({ data }) => this.ingestMessages(data))
-    this.keepaliveTimer = setInterval(() => this.client.send('ping'), 5 * 60 * 1000)
+    this.keepaliveTimer = setInterval(
+      () => this.client.send('ping'),
+      5 * 60 * 1000
+    )
     const { data, message, status } = await this.client.send('info')
     this.info = data
   }
-
 }

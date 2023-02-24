@@ -1,7 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from './pages/Header';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Header from './pages/Header'
 import Home from './pages/Home'
 import './index.css'
 
@@ -14,7 +14,7 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
 const root = createRoot(document.getElementById('root'))

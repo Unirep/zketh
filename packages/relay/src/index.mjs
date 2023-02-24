@@ -46,7 +46,7 @@ let wsApp, httpApp
 
 const db = await SQLiteConnector.create(schema, ':memory:')
 
-const state = { app: httpApp, wsApp, db, synchronizer}
+const state = { app: httpApp, wsApp, db, synchronizer }
 await importFunctionDirectory('ws', state)
 await importFunctionDirectory('http', state)
 

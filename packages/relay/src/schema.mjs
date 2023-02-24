@@ -8,10 +8,10 @@ export default [
       {
         name: '_id',
         type: 'String',
-        default: () => nanoid()
+        default: () => nanoid(),
       },
       ['text', 'String'],
-      ['timestamp', 'Int', { unique: true }]
-    ]
-  }
+      ['timestamp', 'Int', { unique: true }],
+    ],
+  },
 ]

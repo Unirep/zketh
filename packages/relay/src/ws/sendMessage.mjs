@@ -6,7 +6,8 @@ export default ({ wsApp, db, synchronizer }) => {
     let timestamp = +new Date()
     let existing
     do {
-      timestamp += Math.floor(Math.random() * timestampSpread) - timestampSpread/2
+      timestamp +=
+        Math.floor(Math.random() * timestampSpread) - timestampSpread / 2
       existing = await db.count('Message', { timestamp })
     } while (existing > 0)
     const msg = await db.create('Message', {

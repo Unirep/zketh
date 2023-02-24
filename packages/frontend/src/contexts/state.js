@@ -12,7 +12,7 @@ const msg = new Message(state)
 Object.assign(state, {
   ui,
   user,
-  msg
+  msg,
 })
 
 export default createContext(state)

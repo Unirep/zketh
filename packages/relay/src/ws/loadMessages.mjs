@@ -3,8 +3,8 @@ export default ({ wsApp, db, synchronizer }) => {
     const messages = await db.findMany('Message', {
       where: {},
       orderBy: {
-        timestamp: 'desc'
-      }
+        timestamp: 'desc',
+      },
     })
     send(messages)
   })
