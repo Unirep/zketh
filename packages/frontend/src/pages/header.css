@@ -19,3 +19,8 @@ a:visited {
 .links {
     display: flex;
 }
+
+.title {
+    font-weight: bold;
+    font-size: 24px;
+}

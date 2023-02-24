@@ -31,3 +31,7 @@ p {
     right: 0px;
     z-index: 0;
 }
+
+.container {
+  margin:  50px 80px 0 80px;
+}
