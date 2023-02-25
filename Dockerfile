@@ -6,9 +6,9 @@ WORKDIR /src
 
 RUN yarn && rm -rf packages/frontend
 
-RUN sh scripts/loadKeys.sh
+RUN yarn relay keys
 
-RUN rm -r packages/relay/keys/buildOrdered*
+RUN echo "module.exports = {}" > config.js
 
 FROM node:16-buster
 

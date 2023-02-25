@@ -9,7 +9,7 @@ export const provider = ETH_PROVIDER_URL.startsWith('http')
   : new ethers.providers.WebSocketProvider(ETH_PROVIDER_URL)
 
 export const SERVER = 'http://localhost:8000'
-export const WS_SERVER = 'ws://localhost:8001'
-// export const SERVER = 'https://relay.demo.unirep.io'
-export const KEY_SERVER = 'http://localhost:8000/build/'
-// export const KEY_SERVER = 'https://keys.unirep.io/2-beta-1/'
+// export const WS_SERVER = 'ws://localhost:8001'
+export const WS_SERVER = 'wss://relay.zketh.io'
+// export const KEY_SERVER = 'http://localhost:8000/build/'
+export const KEY_SERVER = 'https://keys.unirep.io/2-beta-1/'
