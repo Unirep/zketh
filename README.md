@@ -2,13 +2,23 @@
 
 A monorepo containing solidity contracts, javascript relay, javascript webapp
 
-### 2.2.1 Start a node
+### 1. Installing
+
+Once you have cloned run the following commands
+
+```shell
+yarn
+yarn circuits build
+yarn relay keys
+```
+
+### 1.1 Start a node
 
 ```shell
 yarn contracts hardhat node
 ```
 
-### 2.2.2 Deploy smart contracts
+### 1.2 Deploy smart contracts
 
 in new terminal window, from root:
 
@@ -16,14 +26,13 @@ in new terminal window, from root:
 yarn contracts deploy
 ```
 
-### 2.2.3 Start a relayer (backend)
+### 1.3 Start a relayer (backend)
 
 ```shell
-yarn relay keys &&
 yarn relay start
 ```
 
-### 2.2.4 Start a frontend
+### 1.4 Start a frontend
 
 in new terminal window, from root:
 
