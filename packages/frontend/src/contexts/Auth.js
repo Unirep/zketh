@@ -70,10 +70,32 @@ export default class Auth {
       Buffer.from(`${message.length}${message}`, 'utf8')
     )
 
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x' + BigInt(CHAIN_ID).toString(16) }],
-    })
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x' + BigInt(CHAIN_ID).toString(16) }],
+      })
+    } catch (err) {
+      if (err.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x' + BigInt(CHAIN_ID).toString(16),
+              chainName: 'Arbitrum Goerli',
+              nativeCurrency: {
+                name: 'arbitrum eth',
+                symbol: 'AGOR',
+                decimals: 18,
+              },
+              rpcUrls: ['https://arbitrum.goerli.unirep.io'],
+            },
+          ],
+        })
+      } else {
+        throw err
+      }
+    }
 
     const sig = await window.ethereum.request({
       method: 'eth_signTypedData_v4',

@@ -74,7 +74,7 @@ module.exports = (env, argv) => ({
     new MiniCssExtractPlugin(),
     // new HtmlWebpackInlineSourcePlugin(),
     new webpack.DefinePlugin({
-      NODE_ENV: argv.mode ?? 'development',
+      NODE_ENV: `'${argv.mode}'` ?? `'development'`,
       'process.env': {},
       'process.argv': [],
       'process.versions': {},
