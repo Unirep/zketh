@@ -6,8 +6,6 @@ WORKDIR /src
 
 RUN yarn && rm -rf packages/frontend
 
-RUN yarn circuits build
-
 RUN yarn relay keys
 
 RUN echo "module.exports = {}" > config.js
