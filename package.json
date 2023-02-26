@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "install": "lerna bootstrap && git submodule update --init --recursive && rm node_modules/.bin/circom || true",
+    "circuits": "yarn workspace @zketh/circuits run",
     "contracts": "yarn workspace @zketh/contracts run",
     "frontend": "yarn workspace @zketh/frontend run",
     "relay": "yarn workspace @zketh/relay run",
