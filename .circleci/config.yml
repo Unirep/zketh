@@ -21,16 +21,16 @@ step_defs:
   - run: &check_version
       name: Check Node version
       command: node -v | grep v16
-    - run: &install_circom
-          name: Install Circom
-          command: |
-              curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
-              source "$HOME/.cargo/env"
-              cd /tmp
-              git clone https://github.com/iden3/circom.git
-              cd circom
-              cargo build --release
-              cargo install --path circom
+  - run: &install_circom
+      name: Install Circom
+      command: |
+        curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
+        source "$HOME/.cargo/env"
+        cd /tmp
+        git clone https://github.com/iden3/circom.git
+        cd circom
+        cargo build --release
+        cargo install --path circom
 
 jobs:
   deploy:
