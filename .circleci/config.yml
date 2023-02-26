@@ -63,7 +63,7 @@ jobs:
       - run:
           name: Write dummy config
           command: |
-            echo 'module.exports = { ETH_PROVIDER_URL: "https://goerli.arbitrum.unirep.io" }' > config.js
+            echo 'module.exports = { ETH_PROVIDER_URL: "https://arbitrum.goerli.unirep.io" }' > config.js
       - run:
           name: Build frontend
           command: yarn frontend build --mode production
