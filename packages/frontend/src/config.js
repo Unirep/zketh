@@ -9,13 +9,9 @@ export const provider = ETH_PROVIDER_URL.startsWith('http')
   : new ethers.providers.WebSocketProvider(ETH_PROVIDER_URL)
 
 export const SERVER =
-  NODE_ENV === 'production'
-    ? 'https://relay.zketh.io'
-    : 'http://localhost:8000'
+  NODE_ENV === 'production' ? 'https://relay.zketh.io' : 'http://localhost:8000'
 export const WS_SERVER =
-  NODE_ENV === 'production'
-    ? 'wss://relay.zketh.io/ws'
-    : 'ws://localhost:8001'
+  NODE_ENV === 'production' ? 'wss://relay.zketh.io/ws' : 'ws://localhost:8001'
 export const KEY_SERVER =
   NODE_ENV === 'production'
     ? 'https://relay.zketh.io/build/'
