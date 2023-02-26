@@ -3,6 +3,7 @@ import { Outlet, Link } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import './header.css'
 import state from '../contexts/state'
+import Connect from '../components/Connect'
 
 export default observer(() => {
   const { msg } = React.useContext(state)
@@ -24,15 +25,7 @@ export default observer(() => {
           </div>
         </div>
         <div className="links">
-          <a href="https://developer.unirep.io/" target="blank">
-            Docs
-          </a>
-          <a href="https://github.com/Unirep" target="blank">
-            GitHub
-          </a>
-          <a href="https://discord.com/invite/VzMMDJmYc5" target="blank">
-            Discord
-          </a>
+          <Connect />
         </div>
       </div>
 
