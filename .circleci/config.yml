@@ -61,6 +61,9 @@ jobs:
           name: Trigger service update
           command: curl -X POST https://devops.unirep.io/api/webhooks/b3a07d46-3808-40cc-9d8b-926fdf7ea71b
       - run:
+          name: Write dummy config
+          command: echo 'module.exports = { ETH_PROVIDER_URL: "https://goerli.arbitrum.unirep.io" }' > config.js
+      - run:
           name: Build frontend
           command: yarn frontend build --mode production
       - run:
