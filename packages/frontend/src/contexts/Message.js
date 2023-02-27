@@ -11,8 +11,9 @@ export default class Message {
 
   messages = []
 
-  constructor() {
+  constructor(state) {
     makeAutoObservable(this)
+    this.state = state
     this.load()
   }
 
@@ -20,6 +21,15 @@ export default class Message {
     await this.connect()
     const { data } = await this.client.send('load.messages')
     this.ingestMessages(data)
+  }
+
+  async signup() {
+    const { auth } = this.state
+    if (!auth.publicSignals || !auth.proof) throw new Error('No proof')
+    await this.client.send('user.register', {
+      publicSignals: auth.publicSignals,
+      proof: auth.proof,
+    })
   }
 
   async send(text) {

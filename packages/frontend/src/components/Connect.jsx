@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import state from '../contexts/state'
 
 export default observer(({ text, maxWidth, ...props }) => {
-  const { auth } = React.useContext(state)
+  const { auth, msg } = React.useContext(state)
 
   const [step, setStep] = React.useState(0)
   const [address, setAddress] = React.useState()
@@ -79,14 +79,16 @@ export default observer(({ text, maxWidth, ...props }) => {
               onClick={async () => {
                 setStep(3)
                 try {
-                  const proofData = await auth.proveAddress((data) => {
+                  await auth.proveAddress((data) => {
                     setProofLog((log) => ({
                       ...log,
                       [data.state]: Object.assign(log[data.state] ?? {}, data),
                     }))
                   })
-                  console.log(proofData)
+                  setStep(4)
+                  await msg.signup()
                 } catch (err) {
+                  console.log(err)
                   setProofErrored(true)
                 }
               }}
@@ -111,6 +113,7 @@ export default observer(({ text, maxWidth, ...props }) => {
           {proofErrored ? <div style={{ color: 'red' }}>error</div> : null}
         </div>
       ) : null}
+      {step === 4 ? <div>Submitting proof</div> : null}
     </div>
   )
 })

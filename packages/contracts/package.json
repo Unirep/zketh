@@ -8,7 +8,7 @@
   "main": "build/src/index.js",
   "repository": "git+https://github.com/vivianjeng/create-zketh.git",
   "scripts": {
-    "build": "hardhat compile && yarn abi",
+    "build": "hardhat compile && node scripts/buildVerifiers.mjs && yarn abi",
     "abi": "node scripts/abi",
     "hardhat": "hardhat",
     "deploy": "hardhat run scripts/deploy.mjs",

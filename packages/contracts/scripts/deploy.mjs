@@ -13,15 +13,19 @@ const ZKEth = require('../abi/ZKEth.json')
 
 const [signer] = await ethers.getSigners()
 const unirep = await deployUnirep(signer)
-const epochLength = 100
+
+const SignupVerifier = await ethers.getContractFactory(
+  'SignupWithAddressVerifier'
+)
+const signupVerifier = await SignupVerifier.deploy()
 
 const App = await ethers.getContractFactory('ZKEth')
-const app = await App.deploy(unirep.address, epochLength)
+const app = await App.deploy(unirep.address, signupVerifier.address)
 
 await app.deployed()
 
 console.log(
-  `Unirep app with epoch length ${epochLength} deployed to ${app.address}`
+  `Unirep app with epoch length ${2 ** 32} deployed to ${app.address}`
 )
 
 const config = `module.exports = {

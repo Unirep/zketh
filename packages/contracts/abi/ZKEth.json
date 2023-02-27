@@ -6,38 +6,14 @@
         "name": "_unirep",
         "type": "address"
       },
-      { "internalType": "uint256", "name": "_epochLength", "type": "uint256" }
+      {
+        "internalType": "contract IVerifier",
+        "name": "_signupWithAddressVerifier",
+        "type": "address"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "epochKey", "type": "uint256" },
-      { "internalType": "uint256", "name": "targetEpoch", "type": "uint256" },
-      { "internalType": "uint256", "name": "fieldIndex", "type": "uint256" },
-      { "internalType": "uint256", "name": "val", "type": "uint256" }
-    ],
-    "name": "submitAttestation",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "epochKey", "type": "uint256" },
-      { "internalType": "uint256", "name": "targetEpoch", "type": "uint256" },
-      {
-        "internalType": "uint256[]",
-        "name": "fieldIndices",
-        "type": "uint256[]"
-      },
-      { "internalType": "uint256[]", "name": "vals", "type": "uint256[]" }
-    ],
-    "name": "submitManyAttestations",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   {
     "inputs": [],

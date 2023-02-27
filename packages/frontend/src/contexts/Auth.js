@@ -11,6 +11,7 @@ import poseidon from 'poseidon-lite'
 const ec = new elliptic.ec('secp256k1')
 
 export default class Auth {
+  state = null
   addresses = []
   id = null
   sig = null
@@ -21,8 +22,9 @@ export default class Auth {
 
   messages = []
 
-  constructor() {
+  constructor(state) {
     makeAutoObservable(this)
+    this.state = state
     this.load()
   }
 
@@ -155,9 +157,8 @@ export default class Auth {
         s: [splitToRegisters(s)],
         identity_nullifier: this.id.identityNullifier.toString(),
         identity_trapdoor: this.id.trapdoor.toString(),
-        // TODO
-        attester_id: 1221121,
-        epoch: 1,
+        attester_id: APP_ADDRESS,
+        epoch: 0,
       }
       rs(input)
     })
@@ -170,6 +171,7 @@ export default class Auth {
     await inputs
     const { publicSignals, proof } = await proofPromise
     onUpdate({ state: 30, text: 'building proof', progress: 'done' })
-    return { publicSignals, proof }
+    this.proof = proof
+    this.publicSignals = publicSignals
   }
 }

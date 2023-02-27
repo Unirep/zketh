@@ -5,3 +5,5 @@ config.js
 !packages/**/config.js
 
 zksnarkBuild/
+
+packages/contracts/contracts/verifiers/

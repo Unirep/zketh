@@ -5,48 +5,59 @@ import { Unirep } from "@unirep/contracts/Unirep.sol";
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
+interface IVerifier {
+    /**
+     * @return bool Whether the proof is valid given the hardcoded verifying key
+     *          above and the public inputs
+     */
+    function verifyProof(
+        uint256[] calldata publicSignals,
+        uint256[8] calldata proof
+    ) external view returns (bool);
+}
+
 contract ZKEth {
+
+    IVerifier immutable signupWithAddressVerifier;
     Unirep public unirep;
 
-    constructor(Unirep _unirep, uint256 _epochLength) {
+    constructor(
+        Unirep _unirep,
+        IVerifier _signupWithAddressVerifier
+    ) {
         // set unirep address
         unirep = _unirep;
 
         // sign up as an attester
-        unirep.attesterSignUp(_epochLength);
+        unirep.attesterSignUp(2**32);
+
+        signupWithAddressVerifier = _signupWithAddressVerifier;
     }
 
-    // sign up users in this app
-    function userSignUp(
+    function signup(
         uint256[] memory publicSignals,
         uint256[8] memory proof
     ) public {
-        unirep.userSignUp(publicSignals, proof);
-    }
+        // Verify the proof
+        require(signupWithAddressVerifier.verifyProof(publicSignals, proof), 'proof');
 
-    function submitManyAttestations(
-        uint256 epochKey,
-        uint256 targetEpoch,
-        uint[] calldata fieldIndices,
-        uint[] calldata vals
-    ) public {
-        require(fieldIndices.length == vals.length, 'arrmismatch');
-        for (uint8 x = 0; x < fieldIndices.length; x++) {
-            unirep.attest(epochKey, targetEpoch, fieldIndices[x], vals[x]);
-        }
-    }
+        uint256 identityCommitment = publicSignals[0];
+        uint256 stateTreeLeaf = publicSignals[1];
+        uint256 data0 = publicSignals[2];
 
-    function submitAttestation(
-        uint256 epochKey,
-        uint256 targetEpoch,
-        uint256 fieldIndex,
-        uint256 val
-    ) public {
-        unirep.attest(
-            epochKey,
-            targetEpoch,
-            fieldIndex,
-            val
+        uint256 attesterId = publicSignals[3];
+        require(attesterId == uint256(uint160(address(this))), 'attstr');
+
+        uint64 epoch = uint64(publicSignals[4]);
+
+        uint256[] memory init = new uint256[](1);
+        init[0] = data0;
+
+        unirep.manualUserSignUp(
+            epoch,
+            identityCommitment,
+            stateTreeLeaf,
+            init
         );
     }
 }
