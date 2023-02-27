@@ -21,31 +21,7 @@ export default class User {
     this.load()
   }
 
-  async load() {
-    const id = localStorage.getItem('id')
-    const identity = new ZkIdentity(
-      id ? Strategy.SERIALIZED : Strategy.RANDOM,
-      id
-    )
-    if (!id) {
-      localStorage.setItem('id', identity.serializeIdentity())
-    }
-
-    const userState = new UserState({
-      provider,
-      prover,
-      unirepAddress: UNIREP_ADDRESS,
-      attesterId: APP_ADDRESS,
-      _id: identity,
-    })
-    await userState.sync.start()
-    this.userState = userState
-    await userState.waitForSync()
-    this.hasSignedUp = await userState.hasSignedUp()
-    await this.loadReputation()
-    this.latestTransitionedEpoch =
-      await this.userState.latestTransitionedEpoch()
-  }
+  async load() {}
 
   get fieldCount() {
     return this.userState?.sync.settings.fieldCount

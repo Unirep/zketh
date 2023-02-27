@@ -1,7 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import { ZkIdentity, Strategy, F } from '@unirep/utils'
+import { UserState } from '@unirep/core'
 import { SECP256K1_N, getPointPreComputes, splitToRegisters } from '../utils/ec'
-import { APP_ADDRESS } from '../config'
+import { provider, UNIREP_ADDRESS, APP_ADDRESS } from '../config'
 import prover from './prover'
 import { fromRpcSig, hashPersonalMessage } from '@ethereumjs/util'
 import elliptic from 'elliptic'
@@ -20,6 +21,8 @@ export default class Auth {
   publicSignals = null
   proof = null
 
+  userState = null
+
   messages = []
 
   constructor(state) {
@@ -29,6 +32,19 @@ export default class Auth {
   }
 
   async load() {}
+
+  async startUserState() {
+    if (!this.id) throw new Error('No ZK identity')
+
+    this.userState = new UserState({
+      provider,
+      prover,
+      unirepAddress: UNIREP_ADDRESS,
+      attesterId: APP_ADDRESS,
+      _id: this.id,
+    })
+    await this.userState.sync.start()
+  }
 
   async getAddresses() {
     this.addresses = await ethereum.request({ method: 'eth_requestAccounts' })

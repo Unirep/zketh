@@ -16,15 +16,6 @@
     "type": "constructor"
   },
   {
-    "inputs": [],
-    "name": "unirep",
-    "outputs": [
-      { "internalType": "contract Unirep", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256[]",
@@ -33,9 +24,18 @@
       },
       { "internalType": "uint256[8]", "name": "proof", "type": "uint256[8]" }
     ],
-    "name": "userSignUp",
+    "name": "signup",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unirep",
+    "outputs": [
+      { "internalType": "contract Unirep", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

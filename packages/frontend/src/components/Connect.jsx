@@ -56,7 +56,13 @@ export default observer(({ text, maxWidth, ...props }) => {
             <Button
               onClick={async () => {
                 await auth.getProofSignature(address)
-                setStep(2)
+                await auth.startUserState()
+                await auth.userState.waitForSync()
+                if (await auth.userState.hasSignedUp()) {
+                  setStep(10)
+                } else {
+                  setStep(2)
+                }
               }}
               style={{ fontWeight: 'bold' }}
             >
@@ -86,7 +92,8 @@ export default observer(({ text, maxWidth, ...props }) => {
                     }))
                   })
                   setStep(4)
-                  await msg.signup()
+                  await Promise.all([msg.signup(), auth.startUserState()])
+                  setStep(10)
                 } catch (err) {
                   console.log(err)
                   setProofErrored(true)
@@ -113,7 +120,13 @@ export default observer(({ text, maxWidth, ...props }) => {
           {proofErrored ? <div style={{ color: 'red' }}>error</div> : null}
         </div>
       ) : null}
-      {step === 4 ? <div>Submitting proof</div> : null}
+      {step === 4 ? <div>Submitting proof...</div> : null}
+      {step === 10 ? (
+        <div>
+          <div>Authenticated as</div>
+          <div style={{ fontSize: '12px' }}>{auth.address}</div>
+        </div>
+      ) : null}
     </div>
   )
 })
