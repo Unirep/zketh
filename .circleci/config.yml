@@ -49,6 +49,9 @@ jobs:
           name: Build Circuits
           command: yarn circuits build
       - run:
+          name: Build Contracts
+          command: yarn contracts build
+      - run:
           name: Build relay image
           command: docker build . -t jchancehud/zketh:latest
       - run:
