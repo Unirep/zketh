@@ -46,6 +46,9 @@ jobs:
           name: Install
           command: yarn
       - run:
+          name: Load Beta
+          command: yarn loadBeta
+      - run:
           name: Build Circuits
           command: yarn circuits build
       - run:
