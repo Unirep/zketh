@@ -14,7 +14,6 @@ import { TypedDataUtils } from '@metamask/eth-sig-util'
 const ec = new elliptic.ec('secp256k1')
 
 export default class Auth {
-  state = null
   addresses = []
   id = null
   sig = null
@@ -28,6 +27,8 @@ export default class Auth {
 
   messages = []
 
+  treeCache = {}
+
   constructor(state) {
     makeAutoObservable(this)
     this.state = state
@@ -36,20 +37,35 @@ export default class Auth {
 
   async load() {}
 
+  addressIndex(addr) {
+    if (!this.addressTree) return -1
+    return this.addressTree._nodes[0].indexOf(BigInt(addr))
+  }
+
   async buildAddressTree() {
-    // const url = new URL(`data/ens_tree.json`, SERVER)
-    // const { root, nodes } = await fetch(url.toString()).then((r) => r.json())
-    // const tree = new IncrementalMerkleTree(17)
-    // tree._nodes = nodes
-    // tree._root = root
-    // this.addressTree = tree
-    const url = new URL(`data/unirep_owners.json`, SERVER)
-    const addresses = await fetch(url.toString()).then((r) => r.json())
-    const tree = new IncrementalMerkleTree(17)
-    for (const address of addresses) {
-      tree.insert(BigInt(address))
+    this.addressTree = null
+    const channel = this.state.msg.channels.find(
+      ({ name }) => name === this.state.msg.activeChannel
+    )
+    if (!channel) throw new Error('Unknown channel')
+    if (this.treeCache[this.state.msg.activeChannel]) {
+      this.addressTree = this.treeCache[this.state.msg.activeChannel]
+      return
     }
+    const url = new URL(channel.dataPath, SERVER)
+    const data = await fetch(url.toString()).then((r) => r.text())
+    const treeData = await JSON.parse(data, (key, v) => {
+      if (typeof v === 'string' && v.startsWith('0x')) {
+        return BigInt(v)
+      }
+      return v
+    })
+    const tree = new IncrementalMerkleTree(20)
+    console.log(treeData)
+    tree._nodes = treeData.nodes
+    tree._root = treeData.root
     this.addressTree = tree
+    this.treeCache[this.state.msg.activeChannel] = tree
   }
 
   async startUserState() {
@@ -68,15 +84,15 @@ export default class Auth {
 
   // prove control of an address and sign some text
   async proveAddressData(text) {
-    const hash = ethers.utils.keccak256(
-      '0x' + Buffer.from(text, 'utf8').toString('hex')
-    )
-    // take the upper 250 bits to fit into a bn128 field element
-    const addrIndex = this.addressTree._nodes[0].indexOf(BigInt(this.address))
+    const addrIndex = this.addressIndex(BigInt(this.address))
     if (addrIndex === -1) {
       throw new Error('You are not authorized to chat here')
     }
     const addressTreeProof = this.addressTree.createProof(addrIndex)
+    // take the upper 250 bits to fit into a bn128 field element
+    const hash = ethers.utils.keccak256(
+      '0x' + Buffer.from(text, 'utf8').toString('hex')
+    )
     const sig_data = BigInt(hash) >> BigInt(6)
     const data = await this.userState.getData()
     const stateTree = await this.userState.sync.genStateTree(0)

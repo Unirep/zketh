@@ -1,0 +1,21 @@
+.popup-out {
+  position: absolute;
+  right: 0px;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+
+.popup-inner {
+  max-width: 1200px;
+  min-width: 200px;
+  background: white;
+  border: 1px solid black;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}

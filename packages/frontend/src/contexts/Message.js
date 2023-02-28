@@ -12,6 +12,8 @@ export default class Message {
   info = {}
 
   messages = []
+  channels = []
+  activeChannel = ''
 
   constructor(state) {
     makeAutoObservable(this)
@@ -21,10 +23,22 @@ export default class Message {
 
   async load() {
     await this.connect()
+    {
+      const { data } = await this.client.send('load.channels', {})
+      this.channels = data
+    }
+    await this.changeChannel(this.channels[0].name)
+  }
+
+  async changeChannel(newChannelName) {
+    this.activeChannel = newChannelName
+    this.messages = []
+    const treePromise = this.state.auth.buildAddressTree()
     const { data } = await this.client.send('load.messages', {
-      channelName: CHANNEL_NAME,
+      channelName: newChannelName,
     })
     this.ingestMessages(data)
+    await treePromise
   }
 
   async signup() {
@@ -44,13 +58,14 @@ export default class Message {
       text,
       publicSignals,
       proof,
-      channelName: CHANNEL_NAME,
+      channelName: this.activeChannel,
     })
   }
 
   async ingestMessages(message) {
     let newMessages = [...this.messages]
     for (const msg of [message].flat()) {
+      if (msg.channelName !== this.activeChannel) continue
       newMessages = [msg, ...newMessages.filter((m) => m._id !== msg._id)]
     }
     newMessages.sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1))

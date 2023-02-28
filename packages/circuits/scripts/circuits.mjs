@@ -4,8 +4,8 @@ const {
     FIELD_COUNT,
 } = CircuitConfig.default
 
-const STATE_TREE_DEPTH = 17
-const ADDRESS_TREE_DEPTH = 17
+const STATE_TREE_DEPTH = 20
+const ADDRESS_TREE_DEPTH = 20
 
 export const ptauName = 'powersOfTau28_hez_final_20.ptau'
 

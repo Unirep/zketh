@@ -56,12 +56,13 @@ export default ({ wsApp, db, synchronizer }) => {
       return
     }
     // check the address tree root
-    if (!channels[channelName]) {
+    const channelIndex = channels.findIndex(({ name }) => name === channelName)
+    if (channelIndex === -1) {
       send(`Invalid channel "${channelName}"`, 1)
       return
     }
-    if (BigInt(publicSignals[1]) !== BigInt(channels[channelName])) {
-      send(`Invalid address tree root`, 1)
+    if (BigInt(publicSignals[1]) !== BigInt(channels[channelIndex].root)) {
+      send(`Not authorized to message in this channel`, 1)
       return
     }
     // if everything matches add a message record and

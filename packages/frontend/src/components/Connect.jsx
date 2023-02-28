@@ -12,6 +12,8 @@ export default observer(({ text, maxWidth, ...props }) => {
   const [proofLog, setProofLog] = React.useState({})
   const [proofErrored, setProofErrored] = React.useState(false)
 
+  const loadingTree = auth.addressTree === null
+
   return (
     <div
       style={{
@@ -22,19 +24,23 @@ export default observer(({ text, maxWidth, ...props }) => {
     >
       {step === 0 ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            onClick={async () => {
-              await auth.getAddresses()
-              if (auth.addresses.length === 0) {
-                throw new Error('No addresses selected')
-              }
-              setAddress(auth.addresses[0])
-              setStep(1)
-            }}
-            loadingText="===> metamask"
-          >
-            Connect
-          </Button>
+          {loadingTree ? (
+            <div>Initializing address tree, please wait...</div>
+          ) : (
+            <Button
+              onClick={async () => {
+                await auth.getAddresses()
+                if (auth.addresses.length === 0) {
+                  throw new Error('No addresses selected')
+                }
+                setAddress(auth.addresses[0])
+                setStep(1)
+              }}
+              loadingText="===> metamask"
+            >
+              Connect
+            </Button>
+          )}
         </div>
       ) : null}
       {step === 1 ? (
@@ -48,6 +54,11 @@ export default observer(({ text, maxWidth, ...props }) => {
           </select>
           <div style={{ height: '1rem' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            {auth.addressIndex(address) === -1 ? (
+              <div style={{ color: 'red', fontSize: '10px', maxWidth: '12px' }}>
+                Address not in selected channel
+              </div>
+            ) : null}
             <Button
               loadingText="====> metamask"
               onClick={() => auth.reloadAddresses()}

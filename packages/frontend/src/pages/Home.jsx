@@ -4,53 +4,43 @@ import { observer } from 'mobx-react-lite'
 import './home.css'
 import Tooltip from '../components/Tooltip'
 import Button from '../components/Button'
+import Compose from '../components/Compose'
+import CreateGroup from '../components/CreateGroup'
 
 import state from '../contexts/state'
 
 export default observer(() => {
   const { user, msg, auth } = React.useContext(state)
 
-  const [draft, setDraft] = React.useState('')
-  const [proving, setProving] = React.useState(false)
-  const [error, setError] = React.useState(null)
-
-  const inputRef = React.useRef(null)
+  const [showingCreatePopup, setShowingCreatePopup] = React.useState(false)
 
   return (
     <div className="container">
-      <div className="title">public anonymous chat for ens owners</div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <input
-          ref={inputRef}
-          type="text"
-          value={draft}
-          disabled={proving}
-          onKeyPress={async (e) => {
-            if (e.charCode != 13) return
-            if (!auth.id) return setError('Connect to send messages')
-            try {
-              setError(null)
-              setProving(true)
-              await msg.send(draft)
-              setDraft('')
-              setProving(false)
-              setTimeout(() => inputRef.current.focus(), 1)
-            } catch (err) {
-              setProving(false)
-              setError(err.toString())
-            }
-          }}
-          onChange={(e) => {
-            setDraft(e.target.value)
-          }}
-        />
-        <div style={{ width: '4px' }} />
-        {proving ? <div>Proving...</div> : null}
-        {error ? <div style={{ color: 'red' }}>{error}</div> : null}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex' }}>
+          <select
+            onChange={(e) => msg.changeChannel(e.target.value)}
+            value={msg.activeChannel}
+          >
+            {msg.channels.map((channel) => (
+              <option key={channel.name} value={channel.name}>
+                {channel.name} - {channel.memberCount} members
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button onClick={() => setShowingCreatePopup(true)}>
+          Create Group
+        </Button>
       </div>
+      <div style={{ height: '4px' }} />
+      <Compose />
       {msg.messages.map((m) => (
         <div key={m._id}>{m.text}</div>
       ))}
+      {showingCreatePopup ? (
+        <CreateGroup onDone={() => setShowingCreatePopup(false)} />
+      ) : null}
     </div>
   )
 })

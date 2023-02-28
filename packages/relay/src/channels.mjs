@@ -1,20 +1,38 @@
 import fs from 'fs/promises'
 import url from 'url'
 import path from 'path'
-import { IncrementalMerkleTree } from '@unirep/utils'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
-const _internalLeaves = await fs.readFile(
-  path.join(__dirname, '../data/unirep_owners.json')
-)
-const internalLeaves = JSON.parse(_internalLeaves.toString())
-const internalTree = new IncrementalMerkleTree(17)
-for (const leaf of internalLeaves) {
-  internalTree.insert(BigInt(leaf))
-}
+const _channels = [
+  {
+    name: 'ens',
+    dataPath: `data/ens_tree.json`,
+  },
+  {
+    name: 'internal',
+    dataPath: `data/internal_tree.json`,
+  },
+]
 
-export default {
-  ens: '0x119980738cf0bc5db93b09e3846604577c635422cbec6ae6ce691b8afebc8d06',
-  internal: internalTree.root,
-}
+console.time('Building trees')
+const channels = await Promise.all(
+  _channels.map(async (channel) => {
+    const data = await fs.readFile(path.join(__dirname, '..', channel.dataPath))
+    const treeData = JSON.parse(data, (key, v) => {
+      if (typeof v === 'string' && v.startsWith('0x')) {
+        return BigInt(v)
+      }
+      return v
+    })
+    return {
+      ...channel,
+      root: treeData.root.toString(),
+      elements: treeData.nodes[0],
+      memberCount: treeData.nodes[0].length,
+    }
+  })
+)
+console.timeEnd('Building trees')
+
+export default channels
