@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Button from './Button'
 import { observer } from 'mobx-react-lite'
 import state from '../contexts/state'
+import prover from '../contexts/prover'
 
 export default observer(({ text, maxWidth, ...props }) => {
   const { auth, msg } = React.useContext(state)
@@ -57,6 +58,7 @@ export default observer(({ text, maxWidth, ...props }) => {
               onClick={async () => {
                 await auth.getProofSignature(address)
                 await auth.startUserState()
+                await prover.warmKeys('proveAddress')
                 await auth.userState.waitForSync()
                 if (await auth.userState.hasSignedUp()) {
                   setStep(10)
