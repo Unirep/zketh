@@ -51,6 +51,7 @@ jobs:
       - run:
           name: Build Circuits
           command: yarn circuits build
+          no_output_timeout: 20m
       - run:
           name: Build Contracts
           command: yarn contracts build
