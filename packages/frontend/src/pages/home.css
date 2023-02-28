@@ -35,3 +35,14 @@ p {
 .container {
   margin: 50px 80px 0 80px;
 }
+
+/* .flex {
+  display: flex;
+  justify-content: space-around
+}
+
+.draft {
+  width: 400px;
+  height: 200px;
+  overflow-wrap: break-word;
+} */
