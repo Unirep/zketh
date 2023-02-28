@@ -1,9 +1,9 @@
 import { makeAutoObservable } from 'mobx'
 import { ethers } from 'ethers'
-import { ZkIdentity, Strategy, F } from '@unirep/utils'
+import { ZkIdentity, Strategy, F, IncrementalMerkleTree } from '@unirep/utils'
 import { UserState } from '@unirep/core'
 import { SECP256K1_N, getPointPreComputes, splitToRegisters } from '../utils/ec'
-import { provider, UNIREP_ADDRESS, APP_ADDRESS } from '../config'
+import { provider, UNIREP_ADDRESS, APP_ADDRESS, SERVER } from '../config'
 import prover from './prover'
 import { fromRpcSig, hashPersonalMessage } from '@ethereumjs/util'
 import elliptic from 'elliptic'
@@ -24,6 +24,7 @@ export default class Auth {
   proof = null
 
   userState = null
+  addressTree = null
 
   messages = []
 
@@ -34,6 +35,22 @@ export default class Auth {
   }
 
   async load() {}
+
+  async buildAddressTree() {
+    // const url = new URL(`data/ens_tree.json`, SERVER)
+    // const { root, nodes } = await fetch(url.toString()).then((r) => r.json())
+    // const tree = new IncrementalMerkleTree(17)
+    // tree._nodes = nodes
+    // tree._root = root
+    // this.addressTree = tree
+    const url = new URL(`data/unirep_owners.json`, SERVER)
+    const addresses = await fetch(url.toString()).then((r) => r.json())
+    const tree = new IncrementalMerkleTree(17)
+    for (const address of addresses) {
+      tree.insert(BigInt(address))
+    }
+    this.addressTree = tree
+  }
 
   async startUserState() {
     if (!this.id) throw new Error('No ZK identity')
@@ -46,6 +63,7 @@ export default class Auth {
       _id: this.id,
     })
     await this.userState.sync.start()
+    await this.buildAddressTree()
   }
 
   // prove control of an address and sign some text
@@ -54,6 +72,11 @@ export default class Auth {
       '0x' + Buffer.from(text, 'utf8').toString('hex')
     )
     // take the upper 250 bits to fit into a bn128 field element
+    const addrIndex = this.addressTree._nodes[0].indexOf(BigInt(this.address))
+    if (addrIndex === -1) {
+      throw new Error('You are not authorized to chat here')
+    }
+    const addressTreeProof = this.addressTree.createProof(addrIndex)
     const sig_data = BigInt(hash) >> BigInt(6)
     const data = await this.userState.getData()
     const stateTree = await this.userState.sync.genStateTree(0)
@@ -68,8 +91,8 @@ export default class Auth {
       address: this.address,
       state_tree_elements: stateTreeProof.siblings,
       state_tree_indices: stateTreeProof.pathIndices,
-      address_tree_elements: stateTreeProof.siblings.slice(0, 10),
-      address_tree_indices: stateTreeProof.pathIndices.slice(0, 10),
+      address_tree_elements: addressTreeProof.siblings,
+      address_tree_indices: addressTreeProof.pathIndices,
     }
     console.time('Message proof time')
     const { proof, publicSignals } = await prover.genProofAndPublicSignals(

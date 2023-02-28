@@ -12,7 +12,9 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 const ZKEth = require('../abi/ZKEth.json')
 
 const [signer] = await ethers.getSigners()
-const unirep = await deployUnirep(signer)
+const unirep = await deployUnirep(signer, {
+  STATE_TREE_DEPTH: 17,
+})
 
 const SignupVerifier = await ethers.getContractFactory(
   'SignupWithAddressVerifier'

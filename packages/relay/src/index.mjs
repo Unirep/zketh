@@ -41,6 +41,7 @@ let wsApp, httpApp
   })
   app.use(express.json())
   app.use('/build', express.static(path.join(__dirname, '../keys')))
+  app.use('/data', express.static(path.join(__dirname, '../data')))
   httpApp = app
 }
 
