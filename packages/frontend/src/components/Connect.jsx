@@ -12,8 +12,6 @@ export default observer(({ text, maxWidth, ...props }) => {
   const [proofLog, setProofLog] = React.useState({})
   const [proofErrored, setProofErrored] = React.useState(false)
 
-  const loadingTree = auth.addressTree === null
-
   return (
     <div
       style={{
@@ -24,25 +22,24 @@ export default observer(({ text, maxWidth, ...props }) => {
     >
       {step === 0 ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {loadingTree ? (
-            <div>Initializing address tree, please wait...</div>
-          ) : (
-            <Button
-              onClick={async () => {
-                await auth.getAddresses()
-                if (auth.addresses.length === 0) {
-                  throw new Error('No addresses selected')
-                }
-                setAddress(auth.addresses[0])
-                setStep(1)
-              }}
-              loadingText="===> metamask"
-            >
-              Connect
-            </Button>
-          )}
+          <Button
+            onClick={async () => {
+              await auth.getAddresses()
+              if (auth.addresses.length === 0) {
+                throw new Error('No addresses selected')
+              }
+              setAddress(auth.addresses[0])
+              setStep(20)
+              await auth.buildAddressTree()
+              setStep(1)
+            }}
+            loadingText="===> metamask"
+          >
+            Connect
+          </Button>
         </div>
       ) : null}
+      {step === 20 ? <div>{'>'} Initializing address tree...</div> : null}
       {step === 1 ? (
         <div>
           <select onChange={(e) => setAddress(e.target.value)}>
@@ -55,16 +52,14 @@ export default observer(({ text, maxWidth, ...props }) => {
           <div style={{ height: '1rem' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             {auth.addressIndex(address) === -1 ? (
-              <div style={{ color: 'red', fontSize: '10px', maxWidth: '12px' }}>
-                Address not in selected channel
+              <div
+                style={{ color: 'red', fontSize: '10px', maxWidth: '100px' }}
+              >
+                Address is not in selected channel
               </div>
-            ) : null}
-            <Button
-              loadingText="====> metamask"
-              onClick={() => auth.reloadAddresses()}
-            >
-              Reload Accounts
-            </Button>
+            ) : (
+              <div />
+            )}
             <Button
               onClick={async () => {
                 await auth.getProofSignature(address)
@@ -133,7 +128,7 @@ export default observer(({ text, maxWidth, ...props }) => {
           {proofErrored ? <div style={{ color: 'red' }}>error</div> : null}
         </div>
       ) : null}
-      {step === 4 ? <div>Submitting proof...</div> : null}
+      {step === 4 ? <div>{'>'} Submitting proof...</div> : null}
       {step === 10 ? (
         <div>
           <div>Authenticated as</div>

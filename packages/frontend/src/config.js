@@ -18,9 +18,7 @@ export const provider = ETH_PROVIDER_URL.startsWith('http')
   ? new ethers.providers.JsonRpcProvider(ETH_PROVIDER_URL)
   : new ethers.providers.WebSocketProvider(ETH_PROVIDER_URL)
 
-export const SERVER = prod
-  ? 'https://relay.zketh.io'
-  : 'http://localhost:8000'
+export const SERVER = prod ? 'https://relay.zketh.io' : 'http://localhost:8000'
 export const WS_SERVER = prod
   ? 'wss://relay.zketh.io/ws'
   : 'ws://localhost:8001'

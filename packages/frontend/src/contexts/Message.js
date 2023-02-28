@@ -33,7 +33,10 @@ export default class Message {
   async changeChannel(newChannelName) {
     this.activeChannel = newChannelName
     this.messages = []
-    const treePromise = this.state.auth.buildAddressTree()
+    let treePromise
+    if (this.state.auth.id || this.state.auth.addressTree) {
+      treePromise = this.state.auth.buildAddressTree()
+    }
     const { data } = await this.client.send('load.messages', {
       channelName: newChannelName,
     })
