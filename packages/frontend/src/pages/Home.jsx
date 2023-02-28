@@ -16,25 +16,27 @@ export default observer(() => {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex' }}>
-          <select
-            onChange={(e) => msg.changeChannel(e.target.value)}
-            value={msg.activeChannel}
-          >
-            {msg.channels.map((channel) => (
-              <option key={channel.name} value={channel.name}>
-                {channel.name} - {channel.memberCount} members
-              </option>
-            ))}
-          </select>
+      <div style={{ padding: '4px', border: '1px solid black' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex' }}>
+            <select
+              onChange={(e) => msg.changeChannel(e.target.value)}
+              value={msg.activeChannel}
+            >
+              {msg.channels.map((channel) => (
+                <option key={channel.name} value={channel.name}>
+                  {channel.name} - {channel.memberCount} members
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button onClick={() => setShowingCreatePopup(true)}>
+            Create Group
+          </Button>
         </div>
-        <Button onClick={() => setShowingCreatePopup(true)}>
-          Create Group
-        </Button>
+        <div style={{ height: '4px' }} />
+        <Compose />
       </div>
-      <div style={{ height: '4px' }} />
-      <Compose />
       {msg.messages.map((m) => (
         <div key={m._id}>{m.text}</div>
       ))}

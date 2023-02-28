@@ -9,12 +9,33 @@ export default observer(() => {
   const [proving, setProving] = React.useState(false)
   const [error, setError] = React.useState(null)
 
+  const [errorResetTimer, setErrorResetTimer] = React.useState(null)
+
+  const errorReset = () => {
+    if (errorResetTimer) {
+      clearTimeout(errorResetTimer)
+    }
+    setErrorResetTimer(
+      setTimeout(() => {
+        setErrorResetTimer(null)
+        setError(null)
+      }, 5000)
+    )
+  }
+
+  React.useEffect(() => {
+    errorReset()
+    return () => {
+      if (errorResetTimer) clearTimeout(errorResetTimer)
+    }
+  }, [error])
+
   const inputRef = React.useRef(null)
 
   const canSendMessage = !!auth.id
 
   return (
-    <div style={{ padding: '4px', border: '1px solid black' }}>
+    <div style={{}}>
       {canSendMessage ? null : <div>Connect to send a message</div>}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <input

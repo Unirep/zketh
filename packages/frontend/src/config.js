@@ -4,7 +4,7 @@ import config from '../../../config'
 const prod = NODE_ENV === 'production'
 
 const _UNIREP_ADDRESS = prod
-  ? '0xfe60bf4a6f3ad53df5f70fb2c85e76a4a973382c'
+  ? '0xb882832cf66EBac916a7111eF8f765798362912A'
   : undefined
 const _APP_ADDRESS = prod
   ? '0x94419516bb28297ee54A819d493eC590B3a508bc'
