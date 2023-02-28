@@ -8,6 +8,8 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 const buildPath = path.join(__dirname, `../../keys`)
 
+const vkeyCache = {}
+
 /**
  * The default prover that uses the circuits in default built folder `zksnarkBuild/`
  */
@@ -38,10 +40,16 @@ export default {
    * @returns True if the proof is valid, false otherwise
    */
   verifyProof: async (circuitName, publicSignals, proof) => {
-    const vkeyData = await fs.readFile(
-      path.join(buildPath, `${circuitName}.vkey.json`)
-    )
-    const vkey = JSON.parse(vkeyData.toString())
+    let vkey
+    if (vkeyCache[circuitName]) {
+      vkey = vkeyCache[circuitName]
+    } else {
+      const vkeyData = await fs.readFile(
+        path.join(buildPath, `${circuitName}.vkey.json`)
+      )
+      vkey = JSON.parse(vkeyData.toString())
+      vkeyCache[circuitName] = vkey
+    }
     return snarkjs.groth16.verify(vkey, publicSignals, proof)
   },
 

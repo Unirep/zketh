@@ -33,8 +33,13 @@ export default class Message {
   }
 
   async send(text) {
+    const { publicSignals, proof } = await this.state.auth.proveAddressData(
+      text
+    )
     await this.client.send('create.message', {
       text,
+      publicSignals,
+      proof,
     })
   }
 

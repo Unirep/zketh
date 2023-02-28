@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import { ethers } from 'ethers'
 import { ZkIdentity, Strategy, F } from '@unirep/utils'
 import { UserState } from '@unirep/core'
 import { SECP256K1_N, getPointPreComputes, splitToRegisters } from '../utils/ec'
@@ -8,6 +9,7 @@ import { fromRpcSig, hashPersonalMessage } from '@ethereumjs/util'
 import elliptic from 'elliptic'
 import BN from 'bn.js'
 import poseidon from 'poseidon-lite'
+import { TypedDataUtils } from '@metamask/eth-sig-util'
 
 const ec = new elliptic.ec('secp256k1')
 
@@ -46,6 +48,38 @@ export default class Auth {
     await this.userState.sync.start()
   }
 
+  // prove control of an address and sign some text
+  async proveAddressData(text) {
+    const hash = ethers.utils.keccak256(
+      '0x' + Buffer.from(text, 'utf8').toString('hex')
+    )
+    // take the upper 250 bits to fit into a bn128 field element
+    const sig_data = BigInt(hash) >> BigInt(6)
+    const data = await this.userState.getData()
+    const stateTree = await this.userState.sync.genStateTree(0)
+    const index = await this.userState.latestStateTreeLeafIndex()
+    const stateTreeProof = stateTree.createProof(index)
+    const inputs = {
+      sig_data,
+      attester_id: APP_ADDRESS,
+      identity_secret: this.id.secretHash,
+      data,
+      epoch: 0,
+      address: this.address,
+      state_tree_elements: stateTreeProof.siblings,
+      state_tree_indices: stateTreeProof.pathIndices,
+      address_tree_elements: stateTreeProof.siblings.slice(0, 10),
+      address_tree_indices: stateTreeProof.pathIndices.slice(0, 10),
+    }
+    console.time('Message proof time')
+    const { proof, publicSignals } = await prover.genProofAndPublicSignals(
+      'proveAddress',
+      inputs
+    )
+    console.timeEnd('Message proof time')
+    return { publicSignals, proof }
+  }
+
   async getAddresses() {
     this.addresses = await ethereum.request({ method: 'eth_requestAccounts' })
   }
@@ -59,7 +93,7 @@ export default class Auth {
 
     const CHAIN_ID = 421613
 
-    const message = JSON.stringify({
+    const message = {
       domain: {
         chainId: CHAIN_ID, // arb goerli
         name: 'zketh',
@@ -83,10 +117,9 @@ export default class Auth {
           },
         ],
       },
-    })
-    this.hash = hashPersonalMessage(
-      Buffer.from(`${message.length}${message}`, 'utf8')
-    )
+    }
+
+    this.hash = TypedDataUtils.eip712Hash(message, 'V4')
 
     try {
       await window.ethereum.request({
@@ -117,7 +150,7 @@ export default class Auth {
 
     const sig = await window.ethereum.request({
       method: 'eth_signTypedData_v4',
-      params: [address, message],
+      params: [address, JSON.stringify(message)],
     })
     this.address = address
     this.sig = sig

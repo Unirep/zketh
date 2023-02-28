@@ -8,7 +8,7 @@ import Button from '../components/Button'
 import state from '../contexts/state'
 
 export default observer(() => {
-  const { user, msg } = React.useContext(state)
+  const { user, msg, auth } = React.useContext(state)
 
   const [draft, setDraft] = React.useState('')
 
@@ -20,7 +20,7 @@ export default observer(() => {
         value={draft}
         onKeyPress={async (e) => {
           if (e.charCode != 13) return
-          msg.send(draft)
+          await msg.send(draft)
           setDraft('')
         }}
         onChange={(e) => {
