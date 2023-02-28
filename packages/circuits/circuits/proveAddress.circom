@@ -50,8 +50,6 @@ template ProveAddress(STATE_TREE_DEPTH, EPK_R, FIELD_COUNT, ADDRESS_TREE_DEPTH) 
   component data_0_hasher = Poseidon(2);
   data_0_hasher.inputs[0] <== identity_secret;
   data_0_hasher.inputs[1] <== address;
-  log(identity_secret);
-  log(address);
 
   data[0] === data_0_hasher.out;
 
