@@ -8,7 +8,7 @@ async function loadWithCache(url) {
   const res = await fetch(url.toString())
   const p = new Download(res)
   const d = p.download()
-  d.then((data) => (cache[url] = data))
+  cache[url] = d
   return d
 }
 

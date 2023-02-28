@@ -58,7 +58,7 @@ export default observer(({ text, maxWidth, ...props }) => {
               onClick={async () => {
                 await auth.getProofSignature(address)
                 await auth.startUserState()
-                await prover.warmKeys('proveAddress')
+                prover.warmKeys('proveAddress')
                 await auth.userState.waitForSync()
                 if (await auth.userState.hasSignedUp()) {
                   setStep(10)

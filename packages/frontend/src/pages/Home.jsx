@@ -27,6 +27,7 @@ export default observer(() => {
           disabled={proving}
           onKeyPress={async (e) => {
             if (e.charCode != 13) return
+            if (!auth.id) return setError('Connect to send messages')
             try {
               setError(null)
               setProving(true)

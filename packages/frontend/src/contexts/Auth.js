@@ -95,7 +95,7 @@ export default class Auth {
       address_tree_indices: addressTreeProof.pathIndices,
     }
     console.time('Message proof time')
-    const { proof, publicSignals } = await prover.genProofAndPublicSignals(
+    const { proof, publicSignals } = await prover.genProofWithCache(
       'proveAddress',
       inputs
     )
