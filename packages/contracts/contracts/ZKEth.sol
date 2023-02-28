@@ -41,6 +41,12 @@ contract ZKEth {
         // Verify the proof
         require(signupWithAddressVerifier.verifyProof(publicSignals, proof), 'proof');
 
+        // The expected message hash, in 4 limbs
+        require(publicSignals[5] == 12742213206988075232, 'sig0');
+        require(publicSignals[6] == 10620010067332803895, 'sig1');
+        require(publicSignals[7] == 3731297768199697761, 'sig2');
+        require(publicSignals[8] == 11874718941084289869, 'sig3');
+
         uint256 identityCommitment = publicSignals[0];
         uint256 stateTreeLeaf = publicSignals[1];
         uint256 data0 = publicSignals[2];
