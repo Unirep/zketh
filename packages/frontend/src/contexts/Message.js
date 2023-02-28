@@ -2,6 +2,8 @@ import EspecialClient from 'especial/client'
 import { makeAutoObservable, makeObservable, observable } from 'mobx'
 import { WS_SERVER } from '../config'
 
+const CHANNEL_NAME = 'internal'
+
 export default class Message {
   connection = null
   client = null
@@ -19,7 +21,9 @@ export default class Message {
 
   async load() {
     await this.connect()
-    const { data } = await this.client.send('load.messages')
+    const { data } = await this.client.send('load.messages', {
+      channelName: CHANNEL_NAME,
+    })
     this.ingestMessages(data)
   }
 
@@ -40,6 +44,7 @@ export default class Message {
       text,
       publicSignals,
       proof,
+      channelName: CHANNEL_NAME,
     })
   }
 

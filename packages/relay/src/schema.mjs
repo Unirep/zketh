@@ -12,6 +12,14 @@ export default [
       },
       ['text', 'String'],
       ['timestamp', 'Int', { unique: true }],
+      ['publicSignals', 'String'],
+      ['proof', 'String'],
+      ['channelName', 'String'],
     ],
+  },
+  {
+    name: 'StateTreeRoot',
+    primaryKey: 'hash',
+    rows: [['hash', 'String']],
   },
 ]
