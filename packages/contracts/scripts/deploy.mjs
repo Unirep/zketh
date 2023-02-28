@@ -9,6 +9,19 @@ const { ethers } = hardhat
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
+const retryAsNeeded = async (fn) => {
+  let backoff = 1000
+  for (;;) {
+    try {
+      return await fn()
+    } catch (err) {
+      backoff *= 2
+      console.log(`Failed, waiting ${backoff}ms`)
+      await new Promise((r) => setTimeout(r, backoff))
+    }
+  }
+}
+
 const ZKEth = require('../abi/ZKEth.json')
 
 const [signer] = await ethers.getSigners()
@@ -19,10 +32,12 @@ const unirep = await deployUnirep(signer, {
 const SignupVerifier = await ethers.getContractFactory(
   'SignupWithAddressVerifier'
 )
-const signupVerifier = await SignupVerifier.deploy()
+const signupVerifier = await retryAsNeeded(() => SignupVerifier.deploy())
 
 const App = await ethers.getContractFactory('ZKEth')
-const app = await App.deploy(unirep.address, signupVerifier.address)
+const app = await retryAsNeeded(() =>
+  App.deploy(unirep.address, signupVerifier.address)
+)
 
 await app.deployed()
 
