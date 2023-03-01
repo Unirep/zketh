@@ -41,7 +41,6 @@ jobs:
       - checkout
       - run: *node_version
       - run: *check_version
-      - run: *install_circom
       - run:
           name: Install
           command: yarn
