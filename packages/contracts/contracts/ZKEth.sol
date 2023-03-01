@@ -19,11 +19,14 @@ interface IVerifier {
 contract ZKEth {
 
     IVerifier immutable signupWithAddressVerifier;
+    IVerifier immutable signupNonAnonVerifier;
+
     Unirep public unirep;
 
     constructor(
         Unirep _unirep,
-        IVerifier _signupWithAddressVerifier
+        IVerifier _signupWithAddressVerifier,
+        IVerifier _signupNonAnonVerifier
     ) {
         // set unirep address
         unirep = _unirep;
@@ -32,6 +35,46 @@ contract ZKEth {
         unirep.attesterSignUp(2**32);
 
         signupWithAddressVerifier = _signupWithAddressVerifier;
+        signupNonAnonVerifier = _signupNonAnonVerifier;
+    }
+
+    function signupNonAnon(
+        bytes32 msgHash,
+        bytes memory signature,
+        uint256[] memory publicSignals,
+        uint256[8] memory proof
+    ) public {
+        require(signupNonAnonVerifier.verifyProof(publicSignals, proof), 'proof');
+
+        address expectedAddress = address(uint160(publicSignals[5]));
+        {
+            (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
+            address signer = ecrecover(msgHash, v, r, s);
+            require(signer == expectedAddress, 'addrmismatc');
+        }
+
+        // shift right 6 bits to fit in bn128 field element
+        uint sigHash = uint(keccak256(signature)) >> 6;
+        require(sigHash == publicSignals[6], 'sigmismatc');
+
+        uint256 identityCommitment = publicSignals[0];
+        uint256 stateTreeLeaf = publicSignals[1];
+        uint256 data0 = publicSignals[2];
+
+        uint256 attesterId = publicSignals[3];
+        require(attesterId == uint256(uint160(address(this))), 'attstr');
+
+        uint64 epoch = uint64(publicSignals[4]);
+
+        uint256[] memory init = new uint256[](1);
+        init[0] = data0;
+
+        unirep.manualUserSignUp(
+            epoch,
+            identityCommitment,
+            stateTreeLeaf,
+            init
+        );
     }
 
     function signup(
@@ -65,5 +108,31 @@ contract ZKEth {
             stateTreeLeaf,
             init
         );
+    }
+
+    function splitSignature(
+        bytes memory sig
+    ) public pure returns (bytes32 r, bytes32 s, uint8 v) {
+        require(sig.length == 65, "invalid signature length");
+
+        assembly {
+            /*
+            First 32 bytes stores the length of the signature
+
+            add(sig, 32) = pointer of sig + 32
+            effectively, skips first 32 bytes of signature
+
+            mload(p) loads next 32 bytes starting at the memory address p into memory
+            */
+
+            // first 32 bytes, after the length prefix
+            r := mload(add(sig, 32))
+            // second 32 bytes
+            s := mload(add(sig, 64))
+            // final byte (first byte of the next 32 bytes)
+            v := byte(0, mload(add(sig, 96)))
+        }
+
+        // implicitly return (r, s, v)
     }
 }

@@ -24,6 +24,7 @@ try {
 
 const circuits = {
   signupWithAddress: 0,
+  signupNonAnon: 1,
 }
 
 for (const circuit of Object.keys(circuits)) {

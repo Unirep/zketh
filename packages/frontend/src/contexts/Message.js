@@ -44,6 +44,16 @@ export default class Message {
     await treePromise
   }
 
+  async signupNonAnon(sig, msgHash, publicSignals, proof) {
+    const { auth } = this.state
+    await this.client.send('user.register.nonanon', {
+      msgHash,
+      signature: sig,
+      publicSignals,
+      proof,
+    })
+  }
+
   async signup() {
     const { auth } = this.state
     if (!auth.publicSignals || !auth.proof) throw new Error('No proof')

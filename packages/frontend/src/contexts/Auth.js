@@ -126,6 +126,93 @@ export default class Auth {
     this.addresses = await ethereum.request({ method: 'eth_accounts' })
   }
 
+  async buildNonAnonProof(sigHash) {
+    const inputs = {
+      identity_nullifier: this.id.identityNullifier.toString(),
+      identity_trapdoor: this.id.trapdoor.toString(),
+      attester_id: APP_ADDRESS,
+      epoch: 0,
+      address: this.address,
+      sig_hash: sigHash,
+    }
+    return prover.genProofAndPublicSignals('signupNonAnon', inputs)
+  }
+
+  async getSignupSignature() {
+    if (!window.ethereum) throw new Error('No injected window.ethereum')
+    if (!this.id) throw new Error('No identity loaded')
+    if (!this.address) throw new Error('No address loaded')
+
+    const CHAIN_ID = 421613
+
+    const message = {
+      domain: {
+        chainId: CHAIN_ID, // arb goerli
+        name: 'zketh',
+        verifyingContract: APP_ADDRESS,
+        version: '0',
+      },
+      message: {
+        whatami: '>zketh signup proof<',
+        identity: this.id.genIdentityCommitment().toString(),
+      },
+      primaryType: 'SemaphoreKey',
+      types: {
+        SemaphoreKey: [
+          {
+            name: 'whatami',
+            type: 'string',
+          },
+          {
+            name: 'identity',
+            type: 'string',
+          },
+        ],
+      },
+    }
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x' + BigInt(CHAIN_ID).toString(16) }],
+      })
+    } catch (err) {
+      if (err.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x' + BigInt(CHAIN_ID).toString(16),
+              chainName: 'Arbitrum Goerli',
+              nativeCurrency: {
+                name: 'arbitrum eth',
+                symbol: 'AGOR',
+                decimals: 18,
+              },
+              rpcUrls: ['https://arbitrum.goerli.unirep.io'],
+            },
+          ],
+        })
+      } else {
+        throw err
+      }
+    }
+
+    const sig = await window.ethereum.request({
+      method: 'eth_signTypedData_v4',
+      params: [this.address, JSON.stringify(message)],
+    })
+    const hash = ethers.utils.keccak256(sig)
+    const sigHash = BigInt(hash) >> BigInt(6)
+    return {
+      sig,
+      sigHash,
+      msgHash:
+        '0x' +
+        Buffer.from(TypedDataUtils.eip712Hash(message, 'V4')).toString('hex'),
+    }
+  }
+
   async getProofSignature(address) {
     if (!window.ethereum) throw new Error('No injected window.ethereum')
 

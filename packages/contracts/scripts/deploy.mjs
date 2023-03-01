@@ -34,9 +34,20 @@ const SignupVerifier = await ethers.getContractFactory(
 )
 const signupVerifier = await retryAsNeeded(() => SignupVerifier.deploy())
 
+const SignupNonAnonVerifier = await ethers.getContractFactory(
+  'SignupNonAnonVerifier'
+)
+const signupNonAnonVerifier = await retryAsNeeded(() =>
+  SignupNonAnonVerifier.deploy()
+)
+
 const App = await ethers.getContractFactory('ZKEth')
 const app = await retryAsNeeded(() =>
-  App.deploy(unirep.address, signupVerifier.address)
+  App.deploy(
+    unirep.address,
+    signupVerifier.address,
+    signupNonAnonVerifier.address
+  )
 )
 
 await app.deployed()

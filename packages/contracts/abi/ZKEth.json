@@ -10,6 +10,11 @@
         "internalType": "contract IVerifier",
         "name": "_signupWithAddressVerifier",
         "type": "address"
+      },
+      {
+        "internalType": "contract IVerifier",
+        "name": "_signupNonAnonVerifier",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -27,6 +32,33 @@
     "name": "signup",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "msgHash", "type": "bytes32" },
+      { "internalType": "bytes", "name": "signature", "type": "bytes" },
+      {
+        "internalType": "uint256[]",
+        "name": "publicSignals",
+        "type": "uint256[]"
+      },
+      { "internalType": "uint256[8]", "name": "proof", "type": "uint256[8]" }
+    ],
+    "name": "signupNonAnon",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes", "name": "sig", "type": "bytes" }],
+    "name": "splitSignature",
+    "outputs": [
+      { "internalType": "bytes32", "name": "r", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "s", "type": "bytes32" },
+      { "internalType": "uint8", "name": "v", "type": "uint8" }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {

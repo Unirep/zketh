@@ -85,10 +85,35 @@ export default observer(({ text, maxWidth, ...props }) => {
             Identity {auth.id.genIdentityCommitment().toString(16).slice(0, 8)}
           </div>
           <div>
-            Building an identity proof takes 1-2 minutes. Abort at any time by
-            leaving or refreshing the page.
+            Building an identity proof takes 5-10 minutes. Abort at any time by
+            leaving or refreshing the page. Skip this process by signing up
+            non-anonymously.
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ height: '4px' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button
+              onClick={async () => {
+                setStep(3)
+                try {
+                  const { sig, sigHash, msgHash } =
+                    await auth.getSignupSignature()
+                  const { publicSignals, proof } = await auth.buildNonAnonProof(
+                    sigHash
+                  )
+                  setStep(4)
+                  await Promise.all([
+                    msg.signupNonAnon(sig, msgHash, publicSignals, proof),
+                    auth.startUserState(),
+                  ])
+                  setStep(10)
+                } catch (err) {
+                  console.log(err)
+                  setProofErrored(true)
+                }
+              }}
+            >
+              Non-anonymous
+            </Button>
             <Button
               onClick={async () => {
                 setStep(3)
