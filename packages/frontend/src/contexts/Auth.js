@@ -61,7 +61,6 @@ export default class Auth {
       return v
     })
     const tree = new IncrementalMerkleTree(20)
-    console.log(treeData)
     tree._nodes = treeData.nodes
     tree._root = treeData.root
     this.addressTree = tree

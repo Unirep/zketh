@@ -77,6 +77,7 @@ let wsApp, httpApp
 
 const state = { app: httpApp, wsApp, db, synchronizer }
 await importFunctionDirectory('routes', state)
+await importFunctionDirectory('http', state)
 
 // name relative to file location
 async function importFunctionDirectory(dirname, state) {

@@ -24,5 +24,6 @@ export const WS_SERVER = prod
   : 'ws://localhost:8001'
 export const KEY_SERVER = prod
   ? 'https://keys.zketh.io/v0/'
-  : 'http://localhost:8000/build/'
+  : 'https://keys.zketh.io/v0/'
+//: 'http://localhost:8000/build/'
 // export const KEY_SERVER = 'https://keys.unirep.io/2-beta-1/'
