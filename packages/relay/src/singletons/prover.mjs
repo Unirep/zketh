@@ -29,7 +29,7 @@ export default {
       vkey = vkeyCache[circuitName]
     } else {
       const url = new URL(`${circuitName}.vkey.json`, KEY_SERVER)
-      const vkey = await fetch(url.toString()).then((r) => r.json())
+      vkey = await fetch(url.toString()).then((r) => r.json())
       vkeyCache[circuitName] = vkey
     }
     return snarkjs.groth16.verify(vkey, publicSignals, proof)
