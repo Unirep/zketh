@@ -8,8 +8,6 @@ RUN yarn && rm -rf packages/frontend
 
 RUN yarn loadBeta
 
-RUN yarn relay keys
-
 RUN echo "module.exports = {}" > config.js
 
 FROM node:16-buster
