@@ -1,7 +1,8 @@
 import { ethers } from 'ethers'
 import config from '../../../config'
 
-const prod = NODE_ENV === 'production'
+// const prod = NODE_ENV === 'production'
+const prod = NODE_ENV === 'production' || true
 
 const _UNIREP_ADDRESS = prod
   ? '0xd79A712E39ac4d6D7123B6cd8d1C6262281a6992'

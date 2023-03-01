@@ -35,3 +35,23 @@ p {
 .container {
   margin: 50px 80px 0 80px;
 }
+
+.message-grid {
+  margin: 2rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(15, auto);
+  grid-column-gap: 2rem;
+}
+
+.message {
+  background-color: rgb(235, 235, 235);
+  padding: 1.3rem;
+}
+
+.border {
+  border-left: 4px solid rgb(204, 200, 200);
+  border-radius: 6px;
+  padding: 0.5rem;
+}

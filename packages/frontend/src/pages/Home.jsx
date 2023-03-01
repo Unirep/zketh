@@ -16,6 +16,10 @@ export default observer(() => {
   const [showingCreatePopup, setShowingCreatePopup] = React.useState(false)
 
   const transcriptUrl = new URL(`/transcript/${msg.activeChannel}`, SERVER)
+  const dummyMsgs = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+  ]
 
   return (
     <div className="container">
@@ -44,9 +48,22 @@ export default observer(() => {
         <div style={{ height: '4px' }} />
         <Compose />
       </div>
-      {msg.messages.map((m) => (
-        <div key={m._id}>{m.text}</div>
-      ))}
+      <div className="message-grid">
+        {dummyMsgs.map((m) => (
+          <div className="message">
+            <div className="border">{m}</div>
+          </div>
+        ))}
+      </div >
+      <div className="message-grid">
+        {msg.messages.map((m) => (
+          <div className="message">
+            <div className="border" key={m.id}>
+              {m.text}
+            </div>
+          </div>
+        ))}
+      </div>
       {showingCreatePopup ? (
         <CreateGroup onDone={() => setShowingCreatePopup(false)} />
       ) : null}
