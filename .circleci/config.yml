@@ -48,9 +48,6 @@ jobs:
           name: Load Beta
           command: yarn loadBeta
       - run:
-          name: Build Contracts
-          command: yarn contracts build
-      - run:
           name: Build relay image
           command: docker build . -t jchancehud/zketh:latest
       - run:

@@ -6,7 +6,7 @@ import { APP_ADDRESS } from '../config.mjs'
 import { createRequire } from 'module'
 
 const require = createRequire(import.meta.url)
-const UnirepApp = require('@zketh/contracts/artifacts/contracts/ZKEth.sol/ZKEth.json')
+const UnirepApp = require('@zketh/contracts/abi/ZKEth.json')
 
 export default ({ wsApp, db, synchronizer }) => {
   wsApp.handle('user.register', async (data, send, next) => {
