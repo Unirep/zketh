@@ -204,6 +204,13 @@ export default class Auth {
   }
 
   async proveAddress(onUpdate) {
+    const existingProof = localStorage.getItem(this.address)
+    if (existingProof) {
+      const { proof, publicSignals } = JSON.parse(existingProof)
+      this.proof = proof
+      this.publicSignals = publicSignals
+      return
+    }
     // generate t precomputes as download happens
     const hash = BigInt('0x' + Buffer.from(this.hash).toString('hex'))
     const { v, r, s } = fromRpcSig(this.sig)
@@ -231,6 +238,7 @@ export default class Auth {
     await inputs
     const { publicSignals, proof } = await proofPromise
     onUpdate({ state: 30, text: 'building proof', progress: 'done' })
+    localStorage.setItem(this.address, JSON.stringify({ publicSignals, proof }))
     this.proof = proof
     this.publicSignals = publicSignals
   }
