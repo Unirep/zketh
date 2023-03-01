@@ -3,6 +3,7 @@ import Button from './Button'
 import { observer } from 'mobx-react-lite'
 import state from '../contexts/state'
 import prover from '../contexts/prover'
+import { provider } from '../config'
 
 export default observer(({ text, maxWidth, ...props }) => {
   const { auth, msg } = React.useContext(state)
@@ -20,7 +21,7 @@ export default observer(({ text, maxWidth, ...props }) => {
         border: '1px solid black',
       }}
     >
-      {step === 0 ? (
+      {step === 0 && msg.channels.length ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             onClick={async () => {
@@ -35,7 +36,7 @@ export default observer(({ text, maxWidth, ...props }) => {
             }}
             loadingText="===> metamask"
           >
-            Connect
+            Login
           </Button>
         </div>
       ) : null}
@@ -85,15 +86,15 @@ export default observer(({ text, maxWidth, ...props }) => {
             Identity {auth.id.genIdentityCommitment().toString(16).slice(0, 8)}
           </div>
           <div>
-            Building an identity proof takes 5-10 minutes. Abort at any time by
-            leaving or refreshing the page. Skip this process by signing up
-            non-anonymously.
+            Building an anonymous identity proof takes 5-10 minutes. Abort at
+            any time by leaving or refreshing the page. Skip this process by
+            revealing your address.
           </div>
           <div style={{ height: '4px' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Button
               onClick={async () => {
-                setStep(3)
+                setStep(5)
                 try {
                   const { sig, sigHash, msgHash } =
                     await auth.getSignupSignature()
@@ -101,10 +102,12 @@ export default observer(({ text, maxWidth, ...props }) => {
                     sigHash
                   )
                   setStep(4)
-                  await Promise.all([
+                  const [hash] = await Promise.all([
                     msg.signupNonAnon(sig, msgHash, publicSignals, proof),
                     auth.startUserState(),
                   ])
+                  await provider.waitForTransaction(hash)
+                  await auth.userState.waitForSync()
                   setStep(10)
                 } catch (err) {
                   console.log(err)
@@ -112,7 +115,7 @@ export default observer(({ text, maxWidth, ...props }) => {
                 }
               }}
             >
-              Non-anonymous
+              Reveal address
             </Button>
             <Button
               onClick={async () => {
@@ -125,7 +128,12 @@ export default observer(({ text, maxWidth, ...props }) => {
                     }))
                   })
                   setStep(4)
-                  await Promise.all([msg.signup(), auth.startUserState()])
+                  const [hash] = await Promise.all([
+                    msg.signup(),
+                    auth.startUserState(),
+                  ])
+                  await provider.waitForTransaction(hash)
+                  await auth.userState.waitForSync()
                   setStep(10)
                 } catch (err) {
                   console.log(err)
@@ -154,6 +162,7 @@ export default observer(({ text, maxWidth, ...props }) => {
         </div>
       ) : null}
       {step === 4 ? <div>{'>'} Submitting proof...</div> : null}
+      {step === 5 ? <div>{'>'} Building proof...</div> : null}
       {step === 10 ? (
         <div>
           <div>Authenticated as</div>

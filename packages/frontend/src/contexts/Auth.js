@@ -153,20 +153,26 @@ export default class Auth {
         version: '0',
       },
       message: {
-        whatami: '>zketh signup proof<',
-        identity: this.id.genIdentityCommitment().toString(),
+        // whatami: '>zketh signup proof<',
+        identity: '0x' + this.id.genIdentityCommitment().toString(16),
       },
       primaryType: 'SemaphoreKey',
       types: {
         SemaphoreKey: [
-          {
-            name: 'whatami',
-            type: 'string',
-          },
+          // {
+          //   name: 'whatami',
+          //   type: 'string',
+          // },
           {
             name: 'identity',
-            type: 'string',
+            type: 'uint256',
           },
+        ],
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+          { name: 'verifyingContract', type: 'address' },
         ],
       },
     }
@@ -203,6 +209,12 @@ export default class Auth {
       params: [this.address, JSON.stringify(message)],
     })
     const hash = ethers.utils.keccak256(sig)
+    console.log(
+      BigInt(
+        '0x' +
+          Buffer.from(TypedDataUtils.eip712Hash(message, 'V4')).toString('hex')
+      ).toString()
+    )
     const sigHash = BigInt(hash) >> BigInt(6)
     return {
       sig,

@@ -46,21 +46,23 @@ export default class Message {
 
   async signupNonAnon(sig, msgHash, publicSignals, proof) {
     const { auth } = this.state
-    await this.client.send('user.register.nonanon', {
+    const { data } = await this.client.send('user.register.nonanon', {
       msgHash,
       signature: sig,
       publicSignals,
       proof,
     })
+    return data.hash
   }
 
   async signup() {
     const { auth } = this.state
     if (!auth.publicSignals || !auth.proof) throw new Error('No proof')
-    await this.client.send('user.register', {
+    const { data } = await this.client.send('user.register', {
       publicSignals: auth.publicSignals,
       proof: auth.proof,
     })
+    return data.hash
   }
 
   async send(text) {

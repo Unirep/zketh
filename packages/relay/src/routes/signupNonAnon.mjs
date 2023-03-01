@@ -27,7 +27,6 @@ export default ({ wsApp, db, synchronizer }) => {
     // otherwise we build a transaction and send it
     const appContract = new ethers.Contract(APP_ADDRESS, UnirepAppABI)
     const calldata = appContract.interface.encodeFunctionData('signupNonAnon', [
-      data.msgHash,
       data.signature,
       publicSignals,
       proof,

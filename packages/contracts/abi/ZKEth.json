@@ -23,6 +23,86 @@
   {
     "inputs": [
       {
+        "components": [
+          { "internalType": "string", "name": "name", "type": "string" },
+          { "internalType": "string", "name": "version", "type": "string" },
+          { "internalType": "uint256", "name": "chainId", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "verifyingContract",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct EIP712Domain",
+        "name": "_input",
+        "type": "tuple"
+      }
+    ],
+    "name": "GET_EIP712DOMAIN_PACKETHASH",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "whatami", "type": "string" },
+          { "internalType": "uint256", "name": "identity", "type": "uint256" }
+        ],
+        "internalType": "struct SemaphoreKey",
+        "name": "_input",
+        "type": "tuple"
+      }
+    ],
+    "name": "GET_SEMAPHOREKEY_PACKETHASH",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "domainHash",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "contractName", "type": "string" },
+      { "internalType": "string", "name": "version", "type": "string" },
+      { "internalType": "uint256", "name": "chainId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "verifyingContract",
+        "type": "address"
+      }
+    ],
+    "name": "getEIP712DomainHash",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "whatami", "type": "string" },
+          { "internalType": "uint256", "name": "identity", "type": "uint256" }
+        ],
+        "internalType": "struct SemaphoreKey",
+        "name": "input",
+        "type": "tuple"
+      }
+    ],
+    "name": "getSignupSigHash",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256[]",
         "name": "publicSignals",
         "type": "uint256[]"
@@ -36,7 +116,6 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "msgHash", "type": "bytes32" },
       { "internalType": "bytes", "name": "signature", "type": "bytes" },
       {
         "internalType": "uint256[]",
@@ -48,17 +127,6 @@
     "name": "signupNonAnon",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "bytes", "name": "sig", "type": "bytes" }],
-    "name": "splitSignature",
-    "outputs": [
-      { "internalType": "bytes32", "name": "r", "type": "bytes32" },
-      { "internalType": "bytes32", "name": "s", "type": "bytes32" },
-      { "internalType": "uint8", "name": "v", "type": "uint8" }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {

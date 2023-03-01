@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
+
 import { Unirep } from "@unirep/contracts/Unirep.sol";
+import { EIP712Decoder, SemaphoreKey, EIP712DOMAIN_TYPEHASH, SEMAPHOREKEY_TYPEHASH } from './EIP712.sol';
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
@@ -16,12 +18,14 @@ interface IVerifier {
     ) external view returns (bool);
 }
 
-contract ZKEth {
+contract ZKEth is EIP712Decoder {
 
     IVerifier immutable signupWithAddressVerifier;
     IVerifier immutable signupNonAnonVerifier;
 
     Unirep public unirep;
+
+    bytes32 public immutable domainHash;
 
     constructor(
         Unirep _unirep,
@@ -36,20 +40,48 @@ contract ZKEth {
 
         signupWithAddressVerifier = _signupWithAddressVerifier;
         signupNonAnonVerifier = _signupNonAnonVerifier;
+
+        domainHash = getEIP712DomainHash("zketh","0",block.chainid,address(this));
+    }
+
+    function getEIP712DomainHash(string memory contractName, string memory version, uint256 chainId, address verifyingContract) public pure returns (bytes32) {
+        bytes memory encoded = abi.encode(
+          EIP712DOMAIN_TYPEHASH,
+          keccak256(bytes(contractName)),
+          keccak256(bytes(version)),
+          chainId,
+          verifyingContract
+        );
+        return keccak256(encoded);
+    }
+
+    function getSignupSigHash(SemaphoreKey memory input) public view returns (bytes32) {
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                domainHash,
+                GET_SEMAPHOREKEY_PACKETHASH(input)
+            )
+        );
+        return digest;
     }
 
     function signupNonAnon(
-        bytes32 msgHash,
         bytes memory signature,
         uint256[] memory publicSignals,
         uint256[8] memory proof
     ) public {
         require(signupNonAnonVerifier.verifyProof(publicSignals, proof), 'proof');
 
+        uint256 identityCommitment = publicSignals[0];
+
         address expectedAddress = address(uint160(publicSignals[5]));
         {
-            (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
-            address signer = ecrecover(msgHash, v, r, s);
+            bytes32 msgHash = getSignupSigHash(SemaphoreKey({
+              whatami: ">zketh signup proof<",
+              identity: identityCommitment
+            }));
+            address signer = recover(msgHash, signature);
             require(signer == expectedAddress, 'addrmismatc');
         }
 
@@ -57,7 +89,6 @@ contract ZKEth {
         uint sigHash = uint(keccak256(signature)) >> 6;
         require(sigHash == publicSignals[6], 'sigmismatc');
 
-        uint256 identityCommitment = publicSignals[0];
         uint256 stateTreeLeaf = publicSignals[1];
         uint256 data0 = publicSignals[2];
 
@@ -108,31 +139,5 @@ contract ZKEth {
             stateTreeLeaf,
             init
         );
-    }
-
-    function splitSignature(
-        bytes memory sig
-    ) public pure returns (bytes32 r, bytes32 s, uint8 v) {
-        require(sig.length == 65, "invalid signature length");
-
-        assembly {
-            /*
-            First 32 bytes stores the length of the signature
-
-            add(sig, 32) = pointer of sig + 32
-            effectively, skips first 32 bytes of signature
-
-            mload(p) loads next 32 bytes starting at the memory address p into memory
-            */
-
-            // first 32 bytes, after the length prefix
-            r := mload(add(sig, 32))
-            // second 32 bytes
-            s := mload(add(sig, 64))
-            // final byte (first byte of the next 32 bytes)
-            v := byte(0, mload(add(sig, 96)))
-        }
-
-        // implicitly return (r, s, v)
     }
 }
