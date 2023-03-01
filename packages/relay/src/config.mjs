@@ -15,3 +15,5 @@ export const DB_PATH = process.env.DB_PATH ?? ':memory:'
 export const provider = ETH_PROVIDER_URL.startsWith('http')
   ? new ethers.providers.JsonRpcProvider(ETH_PROVIDER_URL)
   : new ethers.providers.WebSocketProvider(ETH_PROVIDER_URL)
+
+export const KEY_SERVER = 'https://keys.zketh.io/v0/'
