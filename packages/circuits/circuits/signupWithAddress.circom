@@ -1,6 +1,7 @@
 pragma circom 2.0.7;
 
-include "./efficient-zk-ecdsa/circuits/ecdsa_verify_pubkey_to_addr.circom";
+include "./circom-ecdsa/circuits/ecdsa.circom";
+include "./circom-ecdsa/circuits/zk-identity/eth.circom";
 
 include "./unirep/packages/circuits/circuits/circomlib/circuits/poseidon.circom";
 include "./unirep/packages/circuits/circuits/identity.circom";
@@ -18,26 +19,32 @@ template SignupWithAddress(FIELD_COUNT, EPK_R, n, k) {
     signal input identity_trapdoor;
 
     // the signature message hash
-    signal input m[k];
+    signal input r[k];
     signal input s[k];
-    signal input TPreComputes[32][256][2][4]; // T = r^-1 * R
-    signal input _r[k]; // -r^-1
+    signal input msghash[k];
+    signal input pubkey[2][k];
 
-    component sig_verify = ECDSAVerifyPubKeyToAddr(n, k);
+    component sig_verify = ECDSAVerifyNoPubkeyCheck(n, k);
+
     for (var x = 0; x < k; x++) {
-        sig_verify.s[x] <== s[x];
-        sig_verify.m[x] <== m[x];
-        sig_verify._r[x] <== _r[x];
+      sig_verify.r[x] <== r[x];
+      sig_verify.s[x] <== s[x];
+      sig_verify.msghash[x] <== msghash[x];
+      sig_verify.pubkey[0][x] <== pubkey[0][x];
+      sig_verify.pubkey[1][x] <== pubkey[1][x];
     }
-    for (var x = 0; x < 32; x++) {
-        for (var y = 0; y < 256; y++) {
-            for (var z = 0; z < 2; z++) {
-              sig_verify.TPreComputes[x][y][z][0] <== TPreComputes[x][y][z][0];
-              sig_verify.TPreComputes[x][y][z][1] <== TPreComputes[x][y][z][1];
-              sig_verify.TPreComputes[x][y][z][2] <== TPreComputes[x][y][z][2];
-              sig_verify.TPreComputes[x][y][z][3] <== TPreComputes[x][y][z][3];
-            }
-        }
+
+    sig_verify.result === 1;
+
+    component pubkey_flat = FlattenPubkey(n, k);
+    for (var x = 0; x < k; x++) {
+      pubkey_flat.chunkedPubkey[0][x] <== pubkey[0][x];
+      pubkey_flat.chunkedPubkey[1][x] <== pubkey[1][x];
+    }
+
+    component pubkey_address = PubkeyToAddress();
+    for (var x = 0; x < 512; x++) {
+      pubkey_address.pubkeyBits[x] <== pubkey_flat.pubkeyBits[x];
     }
 
     component commitment_calc = IdentityCommitment();
@@ -47,8 +54,11 @@ template SignupWithAddress(FIELD_COUNT, EPK_R, n, k) {
 
     component address_hasher = Poseidon(2);
     address_hasher.inputs[0] <== commitment_calc.secret;
-    address_hasher.inputs[1] <== sig_verify.addr;
+    address_hasher.inputs[1] <== pubkey_address.address;
     data0 <== address_hasher.out;
+
+    log(pubkey_address.address);
+    log(commitment_calc.secret);
 
     component leaf_hasher = StateTreeLeaf(FIELD_COUNT, EPK_R);
     leaf_hasher.identity_secret <== commitment_calc.secret;

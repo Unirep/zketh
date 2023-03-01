@@ -49,10 +49,6 @@ jobs:
           name: Load Beta
           command: yarn loadBeta
       - run:
-          name: Build Circuits
-          command: yarn circuits build
-          no_output_timeout: 20m
-      - run:
           name: Build Contracts
           command: yarn contracts build
       - run:

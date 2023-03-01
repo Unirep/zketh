@@ -4,10 +4,10 @@ import config from '../../../config'
 const prod = NODE_ENV === 'production'
 
 const _UNIREP_ADDRESS = prod
-  ? '0xfed727b602DCEeD6887BA6f16b55886610a91596'
+  ? '0x99aA8eF2122BB34ed128a502b4EB6E604f13f01B'
   : undefined
 const _APP_ADDRESS = prod
-  ? '0xeb46c701aB137c5F87a888bE3A3ADdEb9Df5B63A'
+  ? '0xA28138490daf41c5C030A649114C429b91E252D1'
   : undefined
 
 export const UNIREP_ADDRESS = config.UNIREP_ADDRESS ?? _UNIREP_ADDRESS
@@ -23,6 +23,6 @@ export const WS_SERVER = prod
   ? 'wss://relay.zketh.io/ws'
   : 'ws://localhost:8001'
 export const KEY_SERVER = prod
-  ? 'https://relay.zketh.io/build/'
+  ? 'https://keys.zketh.io/v0/'
   : 'http://localhost:8000/build/'
 // export const KEY_SERVER = 'https://keys.unirep.io/2-beta-1/'

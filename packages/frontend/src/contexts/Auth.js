@@ -5,7 +5,7 @@ import { UserState } from '@unirep/core'
 import { SECP256K1_N, getPointPreComputes, splitToRegisters } from '../utils/ec'
 import { provider, UNIREP_ADDRESS, APP_ADDRESS, SERVER } from '../config'
 import prover from './prover'
-import { fromRpcSig, hashPersonalMessage } from '@ethereumjs/util'
+import { fromRpcSig, hashPersonalMessage, ecrecover } from '@ethereumjs/util'
 import elliptic from 'elliptic'
 import BN from 'bn.js'
 import poseidon from 'poseidon-lite'
@@ -205,52 +205,24 @@ export default class Auth {
 
   async proveAddress(onUpdate) {
     // generate t precomputes as download happens
-    onUpdate({ state: 0, text: 'building witness' })
-
-    onUpdate({ state: 0, progress: '0' })
-    const inputs = new Promise(async (rs, rj) => {
-      await new Promise((r) => setTimeout(r, 1000))
-      const d = fromRpcSig(this.sig)
-      const hash = BigInt('0x' + Buffer.from(this.hash).toString('hex'))
-      const r = BigInt('0x' + Buffer.from(d.r).toString('hex'))
-      const s = BigInt('0x' + Buffer.from(d.s).toString('hex'))
-      const v = BigInt(d.v)
-
-      const isYOdd = (v - 27n) % 2n
-      const rPoint = ec.keyFromPublic(ec.curve.pointFromX(new BN(r), isYOdd))
-      const rInv = new BN(r).invm(SECP256K1_N)
-
-      // w = -(r^-1 * msg)
-      const _r = rInv.neg().umod(SECP256K1_N)
-      // compute w and U in circuit
-      // const w = rInv.mul(new BN(msgHash)).neg().umod(SECP256K1_N);
-      // U = -(w * G) = -(r^-1 * msg * G)
-      // const U = ec.curve.g.mul(w);
-
-      // T = r^-1 * R
-      const T = rPoint.getPublic().mul(rInv)
-
-      console.log('Calculating point cache...')
-      console.time('Point cache calculation')
-      const TPreComputes = await getPointPreComputes(T, (progress) =>
-        onUpdate({ state: 0, progress })
-      )
-      console.timeEnd('Point cache calculation')
-
-      const input = {
-        TPreComputes,
-        _r: [splitToRegisters(_r)],
-        m: [splitToRegisters(hash)],
-        // U: [splitToRegisters(U.x), splitToRegisters(U.y)],
-        s: [splitToRegisters(s)],
-        identity_nullifier: this.id.identityNullifier.toString(),
-        identity_trapdoor: this.id.trapdoor.toString(),
-        attester_id: APP_ADDRESS,
-        epoch: 0,
-      }
-      rs(input)
-    })
-    inputs.then(() => onUpdate({ state: 0, done: true }))
+    const hash = BigInt('0x' + Buffer.from(this.hash).toString('hex'))
+    const { v, r, s } = fromRpcSig(this.sig)
+    const pubkey = ecrecover(Buffer.from(this.hash), v, r, s)
+    const pubkeyHex = Buffer.from(pubkey).toString('hex')
+    if (pubkeyHex.length !== 128) {
+      throw new Error('Invalid public key length')
+    }
+    const _pubkey = [pubkeyHex.slice(0, 64), pubkeyHex.slice(64)]
+    const inputs = {
+      r: [splitToRegisters(BigInt('0x' + Buffer.from(r).toString('hex')))],
+      s: [splitToRegisters(BigInt('0x' + Buffer.from(s).toString('hex')))],
+      msghash: [splitToRegisters(hash)],
+      pubkey: _pubkey.map((k) => splitToRegisters(k)),
+      identity_nullifier: this.id.identityNullifier.toString(),
+      identity_trapdoor: this.id.trapdoor.toString(),
+      attester_id: APP_ADDRESS,
+      epoch: 0,
+    }
     const proofPromise = prover.genProofAndPublicSignals(
       'signupWithAddress',
       inputs,
