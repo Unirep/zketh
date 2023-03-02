@@ -23,11 +23,27 @@ export default class Message {
 
   async load() {
     await this.connect()
-    {
-      const { data } = await this.client.send('load.channels', {})
-      this.channels = data
-    }
+    await this.loadChannels()
     await this.changeChannel(this.channels[0].name)
+  }
+
+  async loadChannels() {
+    const { data } = await this.client.send('load.channels', {})
+    this.channels = data
+  }
+
+  async createChannel(name, addresses) {
+    await this.client.send('create.channel', {
+      name,
+      addresses: addresses.split('\n').map((v) => v.trim()),
+    })
+  }
+
+  async checkChannelName(name) {
+    const { data } = await this.client.send('check.channel.name', {
+      name,
+    })
+    return data.valid
   }
 
   async changeChannel(newChannelName) {

@@ -5,7 +5,10 @@ import './create-group.css'
 import Button from './Button'
 
 export default observer(({ onDone }) => {
-  const { ui, auth } = React.useContext(state)
+  const { ui, msg, auth } = React.useContext(state)
+  const [addresses, setAddresses] = React.useState('')
+  const [name, setName] = React.useState('')
+  const [nameValid, setNameValid] = React.useState(null)
   return (
     <div className="popup-out">
       <div className="popup-inner">
@@ -25,9 +28,52 @@ export default observer(({ onDone }) => {
         </div>
         <div style={{ height: '4px' }} />
         <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-          <div>Addresses, comma separated</div>
-          <textarea style={{ resize: 'none', width: 'calc(100% - 8px)' }} />
-          <Button>Create</Button>
+          <div>Addresses, one per line</div>
+          <textarea
+            style={{ resize: 'none', width: 'calc(100% - 8px)' }}
+            onChange={(e) => {
+              setAddresses(e.target.value)
+            }}
+            value={addresses}
+          />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <input
+              placeholder="name"
+              type="text"
+              onChange={async (e) => {
+                setName(e.target.value)
+                const valid = await msg.checkChannelName(e.target.value)
+                setNameValid(valid)
+              }}
+              value={name}
+            />
+            {nameValid !== null ? (
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  background: nameValid ? 'green' : 'red',
+                  borderRadius: '10px',
+                }}
+              />
+            ) : null}
+          </div>
+          <Button
+            onClick={async () => {
+              await msg.createChannel(name, addresses)
+              await msg.loadChannels()
+              await msg.changeChannel(name)
+              onDone()
+            }}
+          >
+            Create
+          </Button>
         </div>
       </div>
     </div>

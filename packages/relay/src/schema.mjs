@@ -22,4 +22,14 @@ export default [
     primaryKey: 'hash',
     rows: [['hash', 'String']],
   },
+  {
+    name: 'Channel',
+    primaryKey: 'name',
+    rows: [
+      ['name', 'String'],
+      ['memberCount', 'Int'],
+      ['root', 'String'],
+      ['dataPath', 'String'],
+    ],
+  },
 ]

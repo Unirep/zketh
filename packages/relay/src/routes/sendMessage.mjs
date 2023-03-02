@@ -1,7 +1,6 @@
 import { ethers } from 'ethers'
 import prover from '../singletons/prover.mjs'
 import { APP_ADDRESS } from '../config.mjs'
-import channels from '../channels.mjs'
 
 export default ({ wsApp, db, synchronizer }) => {
   wsApp.handle('create.message', async (data, send, next) => {
@@ -56,12 +55,16 @@ export default ({ wsApp, db, synchronizer }) => {
       return
     }
     // check the address tree root
-    const channelIndex = channels.findIndex(({ name }) => name === channelName)
-    if (channelIndex === -1) {
+    const channel = await db.findOne('Channel', {
+      where: {
+        name: channelName,
+      },
+    })
+    if (!channel) {
       send(`Invalid channel "${channelName}"`, 1)
       return
     }
-    if (BigInt(publicSignals[1]) !== BigInt(channels[channelIndex].root)) {
+    if (BigInt(publicSignals[1]) !== BigInt(channel.root)) {
       send(`Not authorized to message in this channel`, 1)
       return
     }

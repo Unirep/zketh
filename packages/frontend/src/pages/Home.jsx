@@ -6,6 +6,7 @@ import Tooltip from '../components/Tooltip'
 import Button from '../components/Button'
 import Compose from '../components/Compose'
 import CreateGroup from '../components/CreateGroup'
+import { SERVER } from '../config'
 
 import state from '../contexts/state'
 
@@ -14,11 +15,13 @@ export default observer(() => {
 
   const [showingCreatePopup, setShowingCreatePopup] = React.useState(false)
 
+  const transcriptUrl = new URL(`/transcript/${msg.activeChannel}`, SERVER)
+
   return (
     <div className="container">
       <div style={{ padding: '4px', border: '1px solid black' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <select
               onChange={(e) => msg.changeChannel(e.target.value)}
               value={msg.activeChannel}
@@ -29,6 +32,10 @@ export default observer(() => {
                 </option>
               ))}
             </select>
+            <div style={{ width: '4px' }} />
+            <a href={transcriptUrl.toString()} target="_blank">
+              transcript
+            </a>
           </div>
           <Button onClick={() => setShowingCreatePopup(true)}>
             Create Group

@@ -7,12 +7,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .popup-inner {
   max-width: 1200px;
-  min-width: 200px;
+  min-width: 400px;
   background: white;
   border: 1px solid black;
   padding: 4px;
