@@ -2,7 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 50px 80px 0 80px;
+  flex-wrap: wrap;
+  margin: 10px 10px 0 10px;
 }
 
 .links {

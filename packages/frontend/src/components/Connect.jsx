@@ -16,7 +16,7 @@ export default observer(({ text, maxWidth, ...props }) => {
   return (
     <div
       style={{
-        width: '25rem',
+        maxWidth: '25rem',
         padding: '8px',
         border: '1px solid black',
       }}
