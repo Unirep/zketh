@@ -291,10 +291,12 @@ export default class Auth {
     })
     this.address = address
     this.sig = sig
-    // TODO: this is unsafe, need to use keccak or sha512
-    const sighash = BigInt(sig) % F
-    const nullifier = poseidon([sighash, 0])
-    const trapdoor = poseidon([sighash, 1])
+    const {
+      default: { sha512 },
+    } = await import(/* webpackPrefetch: true */ 'js-sha512')
+    const h = sha512(sig).padStart(128, '0')
+    const nullifier = BigInt('0x' + h.slice(0, 64)) >> BigInt(6)
+    const trapdoor = BigInt('0x' + h.slice(64)) >> BigInt(6)
     this.id = new ZkIdentity(0)
     this.id._identityTrapdoor = trapdoor
     this.id._identityNullifier = nullifier
