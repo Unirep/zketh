@@ -4,8 +4,13 @@ import { APP_ADDRESS } from '../config.mjs'
 
 export default ({ wsApp, db, synchronizer }) => {
   wsApp.handle('create.message', async (data, send, next) => {
-    const { text, publicSignals, proof, channelName } = data
-    if (!text.trim()) return send(0)
+    const { text: _text, publicSignals, proof, channelName } = data
+    const text = _text.trim()
+    if (!text) return send(0)
+    if (text.length > 400) {
+      send('Message too long', 1)
+      return
+    }
     const verifyPromise = prover.verifyProof(
       'proveAddress',
       publicSignals,
