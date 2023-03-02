@@ -2,5 +2,13 @@ name = "zketh"
 main = "worker.js"
 compatibility_date = "2022-10-18"
 
+[env.production]
+name = "production"
+route = { pattern = "zketh.io/*", zone_name = "zketh.io" }
+
+[env.staging]
+name = "staging"
+route = { pattern = "staging.zketh.io/*", zone_name = "zketh.io" }
+
 [site]
 bucket = "./build"

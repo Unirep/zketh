@@ -25,6 +25,9 @@ export default observer(({ text, maxWidth, ...props }) => {
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             onClick={async () => {
+              if (!window.ethereum) {
+                throw new Error('Metamask not detected')
+              }
               await auth.getAddresses()
               if (auth.addresses.length === 0) {
                 throw new Error('No addresses selected')
