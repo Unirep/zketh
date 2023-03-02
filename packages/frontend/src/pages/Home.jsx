@@ -7,6 +7,7 @@ import Button from '../components/Button'
 import Compose from '../components/Compose'
 import CreateGroup from '../components/CreateGroup'
 import { SERVER } from '../config'
+import MessageCell from '../components/MessageCell'
 
 import state from '../contexts/state'
 
@@ -44,9 +45,21 @@ export default observer(() => {
         <div style={{ height: '4px' }} />
         <Compose />
       </div>
-      {msg.messages.map((m) => (
-        <div key={m._id}>{m.text}</div>
-      ))}
+      <div
+        style={{
+          maxHeight: '50vh',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'wrap',
+          alignItems: 'flex-start',
+          maxWidth: '100vw',
+          overflow: 'hidden',
+        }}
+      >
+        {msg.messages.map((m) => (
+          <MessageCell key={m._id} message={m} />
+        ))}
+      </div>
       {showingCreatePopup ? (
         <CreateGroup onDone={() => setShowingCreatePopup(false)} />
       ) : null}

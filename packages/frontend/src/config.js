@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import config from '../../../config'
 
-const prod = NODE_ENV === 'production'
+const prod = NODE_ENV === 'production' || true
 
 const _UNIREP_ADDRESS = prod
   ? '0xd79A712E39ac4d6D7123B6cd8d1C6262281a6992'
@@ -10,8 +10,8 @@ const _APP_ADDRESS = prod
   ? '0x1D332327d9F965c473D79BBDc0B7196Cf8473e6A'
   : undefined
 
-export const UNIREP_ADDRESS = config.UNIREP_ADDRESS ?? _UNIREP_ADDRESS
-export const APP_ADDRESS = config.APP_ADDRESS ?? _APP_ADDRESS
+export const UNIREP_ADDRESS = _UNIREP_ADDRESS ?? config.UNIREP_ADDRESS
+export const APP_ADDRESS = _APP_ADDRESS ?? config.APP_ADDRESS
 export const ETH_PROVIDER_URL = config.ETH_PROVIDER_URL
 
 export const provider = ETH_PROVIDER_URL.startsWith('http')
