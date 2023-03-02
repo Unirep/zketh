@@ -60,7 +60,8 @@ export default observer(() => {
         {msg.messages.map((m) => (
           <div className="message">
             <div className="border" key={m.id}>
-              {m.text}
+              <div>{m.text}</div>
+              <div>{m.timestamp}</div>
             </div>
           </div>
         ))}
