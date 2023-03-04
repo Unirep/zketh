@@ -32,14 +32,15 @@ export default observer(() => {
 
   const inputRef = React.useRef(null)
 
-  const canSendMessage = !!auth.id
+  const canSendMessage = !!auth.id && !!auth.addressTree
 
   return (
     <div style={{}}>
-      {canSendMessage ? null : <div>Connect to send a message</div>}
+      {!!auth.id ? null : <div>Connect to send a message</div>}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <input
           ref={inputRef}
+          style={{ width: '300px' }}
           type="text"
           value={draft}
           disabled={proving || !canSendMessage}
