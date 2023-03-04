@@ -90,8 +90,8 @@ export default observer(({ text, maxWidth, ...props }) => {
           </div>
           <div>
             Building an anonymous identity proof takes 5-10 minutes. Abort at
-            any time by leaving or refreshing the page. Skip this process by
-            revealing your address.
+            any time by leaving or refreshing the page. This will download ~1 GB
+            of data. Skip this process by revealing your address.
           </div>
           <div style={{ height: '4px' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -145,7 +145,7 @@ export default observer(({ text, maxWidth, ...props }) => {
               }}
               style={{ fontWeight: 'bold' }}
             >
-              Begin
+              Click to begin
             </Button>
           </div>
         </div>
