@@ -86,19 +86,21 @@ export default observer(() => {
           alignItems: 'center',
         }}
       >
-        <img
-          src={require('../../public/pse_logo.svg')}
-          width="25px"
-          style={{ cursor: 'pointer' }}
-          onClick={() => window.open('https://appliedzkp.org')}
-        />
+        <a href="https://appliedzkp.org" target="_blank">
+          <img
+            src={require('../../public/pse_logo.svg')}
+            width="25px"
+            style={{ cursor: 'pointer' }}
+          />
+        </a>
         <div style={{ margin: '8px' }}>x</div>
-        <img
-          src={require('../../public/unirep_logo.svg')}
-          width="20px"
-          style={{ borderRadius: '20px', cursor: 'pointer' }}
-          onClick={() => window.open('https://unirep.io')}
-        />
+        <a href="https://unirep.io" target="_blank">
+          <img
+            src={require('../../public/unirep_logo.svg')}
+            width="20px"
+            style={{ borderRadius: '20px', cursor: 'pointer' }}
+          />
+        </a>
       </div>
     </div>
   )
