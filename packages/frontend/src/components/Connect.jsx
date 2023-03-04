@@ -154,7 +154,7 @@ export default observer(({ text, maxWidth, ...props }) => {
         <div>
           {Object.entries(proofLog).map(([k, v]) => {
             return (
-              <div key={k} style={{ display: 'flex' }}>
+              <div key={k} style={{ display: 'flex', minWidth: '200px' }}>
                 <div>{v.text}</div>
                 <div style={{ flex: 1 }} />
                 <div>{v.done ? 'done' : v.progress}</div>
